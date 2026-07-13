@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: transaction-service
+  datasource:
+    url: jdbc:mysql://localhost:3307/transaction_db
+    username: "eyatrooz"
+    password: "0000"
+  jpa:
+    hibernate:
+      ddl-auto: none
