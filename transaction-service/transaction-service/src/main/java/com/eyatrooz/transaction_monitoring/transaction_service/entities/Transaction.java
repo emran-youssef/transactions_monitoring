@@ -4,10 +4,7 @@ package com.eyatrooz.transaction_monitoring.transaction_service.entities;
 import com.eyatrooz.transaction_monitoring.transaction_service.enums.TransactionStatus;
 import com.eyatrooz.transaction_monitoring.transaction_service.enums.TransactionType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -18,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Transaction {
 
     @Id
@@ -31,7 +29,7 @@ public class Transaction {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "currency", nullable = true)
+    @Column(name = "currency", nullable = false)
     private String currency;
 
     @Column(name = "transaction_type", nullable = false)

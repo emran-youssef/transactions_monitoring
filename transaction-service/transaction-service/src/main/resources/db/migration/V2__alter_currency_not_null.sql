@@ -1,0 +1,3 @@
+
+ALTER TABLE transactions
+    MODIFY COLUMN currency VARCHAR(3) NOT NULL;
