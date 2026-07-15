@@ -3,6 +3,7 @@ package com.eyatrooz.transaction_monitoring.transaction_service.services;
 import com.eyatrooz.transaction_monitoring.transaction_service.dtos.TransactionRequest;
 import com.eyatrooz.transaction_monitoring.transaction_service.dtos.TransactionResponse;
 import com.eyatrooz.transaction_monitoring.transaction_service.enums.TransactionStatus;
+import com.eyatrooz.transaction_monitoring.transaction_service.kafka.TransactionEventPublisher;
 import com.eyatrooz.transaction_monitoring.transaction_service.mappers.TransactionMapper;
 import com.eyatrooz.transaction_monitoring.transaction_service.repositories.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class TransactionService {
 
-    private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+    private final TransactionEventPublisher eventPublisher;
+    private final TransactionRepository transactionRepository;
 
 
     public TransactionResponse createTransaction(TransactionRequest request){
@@ -27,7 +29,11 @@ public class TransactionService {
         var saved = transactionRepository.save(transaction);
         log.info("Transaction saved: id={}, accountId={}, status={}", saved.getId(), saved.getAccountId(), saved.getTransactionStatus());
 
-        return transactionMapper.toDto(saved);
+        var response = transactionMapper.toDto(saved);
+        eventPublisher.publishTransactionCreated(response);
+        log.info("Transaction Event published to Kafka: topic={}, accountId={}", "transactions.created.v1", request.getAccountId());
+
+        return response;
 
     }
 }
