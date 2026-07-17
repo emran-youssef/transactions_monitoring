@@ -1,5 +1,5 @@
 services:
-  mysql:
+  mysql-transactions:
     image: mysql:8.0  # relational DB for transaction_db
     environment:
         MYSQL_ROOT_PASSWORD: "0000"
@@ -9,7 +9,21 @@ services:
     ports:
       - "3307:3306"   # host:container — avoids clashing with local MySQL on 3306
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_transactions-data:/var/lib/mysql
+
+  mysql-rule-engine:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: "0000"
+      MYSQL_DATABASE: rule_engine_db
+      MYSQL_USER: "eyatrooz"
+      MYSQL_PASSWORD: "0000"
+
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_rule_engine_data:/var/lib/mysql
+
 
   # kafka broker's self-config
   kafka:
@@ -27,5 +41,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
 volumes:
-  mysql_data:
+  mysql_transactions-data:
+  mysql_rule_engine_data:
 

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: rule-engine-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3308/rule_engine_db
+    username: "eyatrooz"
+    password: "0000"
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: rule-engin-service
+
+port: 8082
+
