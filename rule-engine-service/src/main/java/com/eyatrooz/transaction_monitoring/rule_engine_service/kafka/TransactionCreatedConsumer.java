@@ -47,7 +47,6 @@ public class TransactionCreatedConsumer {
             return;
         }
 
-
         TransactionCreatedPayload payload = event.getPayload();
         if(transactionHistoryRepository.existsByTransactionId(payload.getId())){
             log.info("transactionId={} already in transaction_history, skipping", payload.getId());
