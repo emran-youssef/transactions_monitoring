@@ -22,11 +22,9 @@ public class TransactionEventPublisher {
         var event = EventMessage.of(TOPIC, response);
         try {
 
-            /*
-             * The event is manually serialized to JSON because the Kafka producer
-             * is configured with StringSerializer. The consumer receives the payload
-             * as a JSON string and deserializes it using ObjectMapper.
-             */
+            // * The event is manually serialized to JSON because the Kafka producer
+            // * is configured with StringSerializer. The consumer receives the payload
+            // * as a JSON string and deserializes it using ObjectMapper.
 
             String json = objectMapper.writeValueAsString(event);
             kafkaTemplate.send(TOPIC, response.getAccountId(), json);
