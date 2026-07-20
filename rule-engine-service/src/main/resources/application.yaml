@@ -15,7 +15,18 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: rule-engin-service
+      group-id: rule-engine-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+rules:
+  threshold:
+    amount: 10000
+    name: THRESHOLD
+  velocity:
+    name: VELOCITY
+  structuring:
+    name: STRUCTURING
 
 server:
   port: 8082
