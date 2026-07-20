@@ -13,6 +13,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     producer:
+      # tell kafka to handle the string coming from the producer and convert it to bytes, because i convert it the object to string in the publisher class
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 

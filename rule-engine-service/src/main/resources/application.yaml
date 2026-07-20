@@ -17,10 +17,6 @@ spring:
     consumer:
       group-id: rule-engin-service
 
-  logging:
-    level:
-      org.apache.kafka.common.config.AbstractConfig: WARN
-
 server:
   port: 8082
 
