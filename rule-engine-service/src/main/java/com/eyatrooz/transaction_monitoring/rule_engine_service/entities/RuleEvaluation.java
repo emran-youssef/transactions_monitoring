@@ -26,9 +26,9 @@ public class RuleEvaluation {
     private Long transactionId;
 
     @Column(name = "account_id", nullable = false)
-    private Long accountId;
+    private String accountId;
 
-    @Column(name = "  overall_risk_score", nullable = false)
+    @Column(name = "overall_risk_score", nullable = false)
     private BigDecimal riskScore;
 
     @Column(name = "flagged", nullable = false)

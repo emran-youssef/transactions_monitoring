@@ -26,7 +26,7 @@ public class TransactionHistory {
     private Long transactionId;
 
     @Column(name = "account_id", nullable = false)
-    private Long accountId;
+    private String accountId;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
