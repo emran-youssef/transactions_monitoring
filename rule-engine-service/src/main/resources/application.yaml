@@ -21,9 +21,11 @@ spring:
 
 rules:
   threshold:
-    amount: 10000
+    amount: 300
     name: THRESHOLD
   velocity:
+    windows-minutes: 10
+    count: 5
     name: VELOCITY
   structuring:
     name: STRUCTURING
