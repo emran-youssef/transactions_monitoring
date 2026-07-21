@@ -21,14 +21,18 @@ spring:
 
 rules:
   threshold:
-    amount: 300
+    amount: 1000
     name: THRESHOLD
   velocity:
-    windows-minutes: 10
+    window-minutes: 10
     count: 5
     name: VELOCITY
   structuring:
     name: STRUCTURING
+    window-minute: 60
+    min-transactions: 3
+    threshold: 1000
+
 
 server:
   port: 8082
