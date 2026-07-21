@@ -1,6 +1,7 @@
 package com.eyatrooz.transaction_monitoring.rule_engine_service.rules;
 
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.TransactionHistory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+@Slf4j
 @Component
 public class StructuringRule implements FraudRule {
 
@@ -43,6 +45,10 @@ public class StructuringRule implements FraudRule {
         if(sum.compareTo(threshold) > 0) {
             String details = "%d sub-threshold transactions totaling %s exceed threshold %s within %d minutes"
                     .formatted(qualifying.size(), sum, threshold, windowMinutes);
+
+            log.info("StructuringRule triggered: accountId={}, transactionCount={}, sum={}, threshold={}",
+                    context.transaction().getAccountId(), qualifying.size(), sum, threshold);
+
             return new RuleResult(ruleName, true, sum, details);
         }
 

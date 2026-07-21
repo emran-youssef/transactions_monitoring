@@ -1,13 +1,16 @@
 package com.eyatrooz.transaction_monitoring.rule_engine_service.rules;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.function.BiFunction;
 
+
+@Slf4j
 @Component
 public class VelocityRule implements FraudRule {
 
@@ -35,6 +38,10 @@ public class VelocityRule implements FraudRule {
         if (countInWindow >= maxCount) {
             String details = "%d transactions in the last %d minutes meets/exceeds limit of %d"
                     .formatted(countInWindow, windowMinutes, maxCount);
+
+            log.info("VelocityRule triggered: accountId={}, countInWindow={}, windowMinutes={}, maxCount={}",
+                    context.transaction().getAccountId(), countInWindow, windowMinutes, maxCount);
+
             return new RuleResult(ruleName, true, BigDecimal.valueOf(countInWindow), details);
         }
 
