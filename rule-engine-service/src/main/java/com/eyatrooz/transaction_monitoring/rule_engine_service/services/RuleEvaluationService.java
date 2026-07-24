@@ -60,6 +60,7 @@ public class RuleEvaluationService {
         }
     }
 
+    // Helpers
     private RuleEvaluation toEvaluation(RuleExecutorResult result, TransactionHistory transactionHistory) {
         RuleEvaluation evaluation = RuleEvaluation.builder()
                 .transactionId(transactionHistory.getTransactionId())

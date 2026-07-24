@@ -25,7 +25,7 @@ public class ThresholdRule implements FraudRule{
              String details = "Transaction amount %s exceeds threshold %s"
                     .formatted(amount, threshold);
 
-            log.info("ThresholdRule triggered: accountId={}, amount={}, threshold={}, excess={}",
+            log.info("ThresholdRule triggered: accountId={}, amount={}, threshold={}, exceeds by={}",
                     context.transaction().getAccountId(), amount, threshold, amount.subtract(threshold));
 
             return new RuleResult(ruleName, true, amount.subtract(threshold),details);
