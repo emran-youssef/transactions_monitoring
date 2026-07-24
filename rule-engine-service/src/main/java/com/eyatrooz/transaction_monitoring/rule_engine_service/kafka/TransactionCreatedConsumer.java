@@ -53,6 +53,11 @@ public class TransactionCreatedConsumer {
         }
 
         TransactionCreatedPayload payload = event.getPayload();
+
+        log.info("==================================================");
+        log.info("Processing transaction {}", payload.getId());
+        log.info("==================================================");
+
         if(transactionHistoryRepository.existsByTransactionId(payload.getId())){
             log.info("transactionId={} already in transaction_history, skipping", payload.getId());
             return;

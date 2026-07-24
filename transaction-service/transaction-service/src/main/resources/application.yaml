@@ -8,7 +8,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -20,3 +20,4 @@ spring:
 logging:
   level:
     org.apache.kafka.common.config.AbstractConfig: WARN
+    
