@@ -3,6 +3,9 @@ package com.eyatrooz.transaction_monitoring.rule_engine_service.kafka;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.dtos.TransactionCreatedPayload;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.TransactionHistory;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.TransactionHistoryRepository;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.rules.RuleContext;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.rules.RuleExecutor;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.services.RuleEvaluationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,7 +19,9 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class TransactionCreatedConsumer {
 
+
     private final ObjectMapper objectMapper;
+    private final RuleEvaluationService ruleEvaluationService;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
     /**
@@ -53,7 +58,7 @@ public class TransactionCreatedConsumer {
             return;
         }
 
-        var transactionHistory = TransactionHistory.builder()
+        var transaction = TransactionHistory.builder()
                 .transactionId(payload.getId())
                 .accountId(payload.getAccountId())
                 .amount(payload.getAmount())
@@ -62,7 +67,13 @@ public class TransactionCreatedConsumer {
                 .receivedAt(payload.getReceivedAt())
                 .build();
 
-        transactionHistoryRepository.save(transactionHistory);
+        transactionHistoryRepository.save(transaction);
         log.info("Persisted transaction_history for transactionId={}", payload.getId());
+
+        ruleEvaluationService.evaluate(transaction);
+
+
+
+
     }
 }
