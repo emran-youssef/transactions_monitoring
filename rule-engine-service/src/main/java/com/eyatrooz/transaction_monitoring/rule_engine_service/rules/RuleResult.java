@@ -9,6 +9,6 @@ public record RuleResult(
         String details
 ) {
     public static RuleResult notTriggered(String ruleName){
-        return new RuleResult(ruleName, false, BigDecimal.ZERO, null);
+        return new RuleResult(ruleName, false, BigDecimal.ZERO, "Rule not triggered");
     }
 }

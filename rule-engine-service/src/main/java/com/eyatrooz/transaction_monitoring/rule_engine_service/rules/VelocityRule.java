@@ -14,7 +14,7 @@ import java.time.temporal.ChronoUnit;
 @Component
 public class VelocityRule implements FraudRule {
 
-    @Value("${rules.velocity.widows-minutes:10}")
+    @Value("${rules.velocity.window-minutes:10}")
     private long windowMinutes;
 
     @Value("${rules.velocity.count}")

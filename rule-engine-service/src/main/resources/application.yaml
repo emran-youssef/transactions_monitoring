@@ -10,7 +10,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -21,7 +21,7 @@ spring:
 
 rules:
   threshold:
-    amount: 1000
+    amount: 10000
     name: THRESHOLD
   velocity:
     window-minutes: 10
@@ -32,7 +32,7 @@ rules:
     window-minute: 60
     min-transactions: 3
     threshold: 1000
-
+  recent-history-window-hours: 24
 
 server:
   port: 8082
