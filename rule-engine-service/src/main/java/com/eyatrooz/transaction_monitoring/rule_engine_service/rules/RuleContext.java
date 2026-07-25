@@ -9,5 +9,4 @@ import java.util.List;
 public record RuleContext(
         TransactionHistory transaction,
         List<TransactionHistory> recentHistory
-
 ) { }

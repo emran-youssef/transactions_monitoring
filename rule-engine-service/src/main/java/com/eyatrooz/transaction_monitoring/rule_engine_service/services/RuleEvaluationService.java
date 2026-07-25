@@ -43,7 +43,6 @@ public class RuleEvaluationService {
                 transaction.getAccountId(), since);
 
         RuleContext context = new RuleContext(transaction, recentHistory);
-
         RuleExecutorResult result = ruleExecutor.execute(context);
 
         // persist the result to ruleEvaluation.

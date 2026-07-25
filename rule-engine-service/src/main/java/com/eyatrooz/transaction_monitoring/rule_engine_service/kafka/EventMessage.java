@@ -12,12 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventMessage<T> {
-
     private String eventId;
     private String eventType;
     private Instant occuredAt;
     private T payload;
-
 
     public static <T> EventMessage<T> of(String eventType, T payload){
        return EventMessage.<T>builder()

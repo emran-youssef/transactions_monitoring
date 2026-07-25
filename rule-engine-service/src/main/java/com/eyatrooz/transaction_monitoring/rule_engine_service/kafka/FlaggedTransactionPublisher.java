@@ -22,7 +22,6 @@ public class FlaggedTransactionPublisher{
     private static final String TOPIC = "transactions.flagged.v1";
 
     public void publishFlagged(RuleEvaluation ruleEvaluation){
-
         var payload = ruleEvaluationMapper.toFlaggedPayload(ruleEvaluation);
         var event = EventMessage.of(TOPIC, payload);
 
