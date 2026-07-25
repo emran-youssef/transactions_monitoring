@@ -89,7 +89,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>11.14.1</version>
                 <configuration>
-                    <url>jdbc:mysql://localhost:3308/rule_engine_db</url>
+                    <url>jdbc:mysql://localhost:3309/case_management_db</url>
                     <user>eyatrooz</user>
                     <password>0000</password>
                     <locations>
