@@ -2,7 +2,7 @@ package com.eyatrooz.transaction_monitoring.case_management_service.kafka;
 
 
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.TransactionFlaggedPayload;
-import com.eyatrooz.transaction_monitoring.case_management_service.repositories.FlaggedTransactionEventRepository;
+import com.eyatrooz.transaction_monitoring.case_management_service.services.CaseCreationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,6 +16,7 @@ import tools.jackson.databind.ObjectMapper;
 public class FlaggedTransactionConsumer {
 
     private final ObjectMapper objectMapper;
+    private final CaseCreationService  caseCreationService;
 
     @KafkaListener(topics = "transactions.flagged.v1", groupId = "case-management-service")
     public void consumeFlaggedTransaction(String message){
@@ -29,9 +30,13 @@ public class FlaggedTransactionConsumer {
 
         } catch (JacksonException ex) {
             log.error("Failed to deserialize transactions.flagged.v1 message: {}", message, ex);
+            return;
         }
-        }
+
+        // proceeds the flaggedTransaction process: open case & history
+        caseCreationService.processFlaggedTransaction(event.getPayload());
     }
+}
 
 
 

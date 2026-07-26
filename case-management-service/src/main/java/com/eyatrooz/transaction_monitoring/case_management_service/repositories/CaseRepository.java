@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface CaseRepository extends JpaRepository<Case, Long> {
     Optional<Case> findByTransactionId(Long aLong);
+    boolean existsByTransactionId(Long transactionId);
 }
