@@ -12,7 +12,6 @@ spring:
     hibernate:
       ddl-auto: none
 
-
 kafka:
   bootstrap-servers: localhost:9092
 
@@ -29,3 +28,6 @@ kafka:
 logging:
   level:
     org.apache.kafka.common.config.AbstractConfig: WARN
+    org.apache.kafka.clients.consumer.internals: WARN
+    org.apache.kafka.clients.NetworkClient: WARN
+    org.apache.kafka.clients.Metadata: WARN

@@ -44,4 +44,13 @@ public class CaseHistory {
         }
     }
 
+
+    public static CaseHistory opened(Long transactionId){
+        return CaseHistory.builder()
+                .action(CaseStatus.OPEN)
+                .comment("Case created for flagged transaction, transactionId=" + transactionId)
+                .build();
+    }
+
+
 }

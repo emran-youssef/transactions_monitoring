@@ -140,8 +140,8 @@ The platform is being built incrementally across eight milestones, each independ
 
 - [x] **Milestone 1** — Transaction Service (standalone, REST + persistence)
 - [x] **Milestone 2** — Kafka integration (event publishing from Transaction Service)
-- [ ] **Milestone 3** — Rule Engine Service (Kafka consumer, Strategy-pattern rule evaluation) — *in progress*
-- [ ] **Milestone 4** — Case Management Service
+- [x] **Milestone 3** — Rule Engine Service (Kafka consumer, Strategy-pattern rule evaluation)
+- [ ] **Milestone 4** — Case Management Service — *in progress*
 - [ ] **Milestone 5** — Audit Service
 - [ ] **Milestone 6** — Security (JWT authentication, RBAC)
 - [ ] **Milestone 7** — Production hardening (idempotency, DLQ, Outbox pattern)

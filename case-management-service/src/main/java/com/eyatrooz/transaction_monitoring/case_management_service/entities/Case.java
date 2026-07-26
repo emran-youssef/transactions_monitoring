@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.case_management_service.entities;
 
+import com.eyatrooz.transaction_monitoring.case_management_service.dtos.TransactionFlaggedPayload;
 import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -66,5 +67,17 @@ public class Case {
     }
 
 
+    public static Case from(TransactionFlaggedPayload payload){
+        var newCase = Case.builder()
+                .transactionId(payload.getTransactionId())
+                .accountId(payload.getAccountId())
+                .riskScore(payload.getRiskScore())
+                .status(CaseStatus.OPEN)
+                .build();
+
+        newCase.addHistory(CaseHistory.opened(payload.getTransactionId()));
+        return newCase;
+
+    }
 
 }

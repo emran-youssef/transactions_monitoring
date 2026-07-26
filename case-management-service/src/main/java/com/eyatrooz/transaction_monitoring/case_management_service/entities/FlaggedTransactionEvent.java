@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.case_management_service.entities;
 
+import com.eyatrooz.transaction_monitoring.case_management_service.dtos.TransactionFlaggedPayload;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,4 +45,14 @@ public class FlaggedTransactionEvent {
         }
     }
 
+
+    public static FlaggedTransactionEvent from(TransactionFlaggedPayload payload) {
+        return FlaggedTransactionEvent.builder()
+                .transactionId(payload.getTransactionId())
+                .accountId(payload.getAccountId())
+                .riskScore(payload.getRiskScore())
+                .flagged(payload.getFlagged())
+                .evaluatedAt(payload.getEvaluatedAt())
+                .build();
+    }
 }
