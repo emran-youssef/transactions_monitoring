@@ -8,4 +8,5 @@ public class CaseActionRequest {
 
     @NotBlank
     private String analyst;
+    private String explanation;
 }

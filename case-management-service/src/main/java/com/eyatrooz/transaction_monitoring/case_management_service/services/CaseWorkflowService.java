@@ -40,14 +40,14 @@ public class CaseWorkflowService {
     }
 
     @Transactional
-    public CaseResponse approve(Long caseId, String analyst){
+    public CaseResponse approve(Long caseId, String analyst, String explanation){
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);
         requireAssignedAnalyst(fetchedCase, analyst);
 
         fetchedCase.setStatus(CaseStatus.APPROVED);
-        fetchedCase.addHistory(CaseHistory.approved(analyst));
+        fetchedCase.addHistory(CaseHistory.approved(analyst, explanation));
 
         // persist the case, and history persisted by Spring via cascade.All
         var persisted = caseRepository.save(fetchedCase);
@@ -57,14 +57,14 @@ public class CaseWorkflowService {
     }
 
     @Transactional
-    public CaseResponse escalate(Long caseId, String analyst){
+    public CaseResponse escalate(Long caseId, String analyst, String explanation){
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);
         requireAssignedAnalyst(fetchedCase, analyst);
 
         fetchedCase.setStatus(CaseStatus.ESCALATED);
-        fetchedCase.addHistory(CaseHistory.escalated(analyst));
+        fetchedCase.addHistory(CaseHistory.escalated(analyst, explanation));
 
         // persist the case, and history persisted by Spring via cascade.All
         var persisted = caseRepository.save(fetchedCase);

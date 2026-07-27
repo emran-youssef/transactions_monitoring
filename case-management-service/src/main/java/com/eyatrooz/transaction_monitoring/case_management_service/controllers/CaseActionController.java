@@ -25,13 +25,13 @@ public class CaseActionController {
 
     @PutMapping("/{id}/approve")
     public ResponseEntity<CaseResponse> approve(@PathVariable Long id, @Valid @RequestBody CaseActionRequest request) {
-        var response = caseWorkflowService.approve(id, request.getAnalyst());
+        var response = caseWorkflowService.approve(id, request.getAnalyst(), request.getExplanation());
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}/escalate")
     public ResponseEntity<CaseResponse> escalate(@PathVariable Long id, @Valid @RequestBody CaseActionRequest request) {
-        var response = caseWorkflowService.escalate(id, request.getAnalyst());
+        var response = caseWorkflowService.escalate(id, request.getAnalyst(), request.getExplanation());
         return ResponseEntity.ok(response);
     }
 }

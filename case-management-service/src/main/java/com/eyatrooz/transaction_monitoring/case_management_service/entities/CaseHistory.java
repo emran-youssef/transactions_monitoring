@@ -57,24 +57,24 @@ public class CaseHistory {
         return CaseHistory.builder()
                 .eventType(CaseHistoryEventType.CASE_ASSIGNED)
                 .analyst(analyst)
-                .comment("case assigned to analyst:"+ analyst)
+                .comment("Case assigned to analyst: "+analyst)
                 .build();
 
     }
 
-    public static CaseHistory approved(String analyst){
+    public static CaseHistory approved(String analyst, String explanation){
         return CaseHistory.builder()
                 .eventType(CaseHistoryEventType.CASE_APPROVED)
                 .analyst(analyst)
-                .comment("case approved by analyst:"+ analyst)
+                .comment(explanation)
                 .build();
     }
 
-    public static CaseHistory escalated(String analyst){
+    public static CaseHistory escalated(String analyst, String explanation){
         return CaseHistory.builder()
                 .eventType(CaseHistoryEventType.CASE_ESCALATED)
                 .analyst(analyst)
-                .comment("case escalated by analyst:"+ analyst)
+                .comment(explanation)
                 .build();
     }
 
