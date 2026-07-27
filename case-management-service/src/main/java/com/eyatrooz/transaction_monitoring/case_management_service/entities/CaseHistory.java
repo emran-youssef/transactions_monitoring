@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.case_management_service.entities;
 
+import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseHistoryEventType;
 import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,9 +25,9 @@ public class CaseHistory {
     @JoinColumn(name = "case_id", nullable = false)
     private Case caseEntity;
 
-    @Column(name = "action", nullable = false)
+    @Column(name = "event_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private CaseStatus action;
+    private CaseHistoryEventType eventType;
 
     @Column(name = "analyst")
     private String analyst;
@@ -47,8 +48,33 @@ public class CaseHistory {
 
     public static CaseHistory opened(Long transactionId){
         return CaseHistory.builder()
-                .action(CaseStatus.OPEN)
+                .eventType(CaseHistoryEventType.CASE_CREATED)
                 .comment("Case created for flagged transaction, transactionId=" + transactionId)
+                .build();
+    }
+
+    public static CaseHistory assigned(String analyst){
+        return CaseHistory.builder()
+                .eventType(CaseHistoryEventType.CASE_ASSIGNED)
+                .analyst(analyst)
+                .comment("case assigned to analyst:"+ analyst)
+                .build();
+
+    }
+
+    public static CaseHistory approved(String analyst){
+        return CaseHistory.builder()
+                .eventType(CaseHistoryEventType.CASE_APPROVED)
+                .analyst(analyst)
+                .comment("case approved by analyst:"+ analyst)
+                .build();
+    }
+
+    public static CaseHistory escalated(String analyst){
+        return CaseHistory.builder()
+                .eventType(CaseHistoryEventType.CASE_ESCALATED)
+                .analyst(analyst)
+                .comment("case escalated by analyst:"+ analyst)
                 .build();
     }
 
