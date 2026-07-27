@@ -67,7 +67,7 @@ public class Case {
     }
 
 
-    public static Case from(TransactionFlaggedPayload payload){
+    public static Case createFrom(TransactionFlaggedPayload payload){
         var newCase = Case.builder()
                 .transactionId(payload.getTransactionId())
                 .accountId(payload.getAccountId())
