@@ -12,18 +12,18 @@ spring:
     hibernate:
       ddl-auto: none
 
-kafka:
-  bootstrap-servers: localhost:9092
+  kafka:
+    bootstrap-servers: localhost:9092
 
-  consumer:
-    group-id: case-management-service
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    auto-offset-reset: earliest
+    consumer:
+      group-id: case-management-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
 
-  producer:
-    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 logging:
   level:

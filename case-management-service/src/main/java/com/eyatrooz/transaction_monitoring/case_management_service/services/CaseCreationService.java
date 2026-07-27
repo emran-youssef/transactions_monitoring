@@ -1,10 +1,13 @@
 package com.eyatrooz.transaction_monitoring.case_management_service.services;
 
+import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CaseCreatedPayload;
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.TransactionFlaggedPayload;
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.Case;
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.CaseHistory;
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.FlaggedTransactionEvent;
 import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseStatus;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.CaseCreatedPublisher;
+import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.FlaggedTransactionEventRepository;
 import jakarta.transaction.Transactional;
@@ -19,7 +22,9 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class CaseCreationService {
 
+    private final CaseMapper caseMapper;
     private final CaseRepository caseRepository;
+    private final CaseCreatedPublisher caseCreatedPublisher;
     private final FlaggedTransactionEventRepository flaggedTransactionEventRepository;
 
     @Transactional
@@ -28,7 +33,7 @@ public class CaseCreationService {
 
         if(transactionExists(transactionId)) {
             log.warn("Flagged Event already recorded for transactionId={}", payload.getTransactionId());
-            return;
+            return ;
         }
 
         var flaggedTransaction = FlaggedTransactionEvent.from(payload);
@@ -36,15 +41,21 @@ public class CaseCreationService {
 
         if(caseExists(transactionId)){
             log.warn("Case already exists for transactionId={}, skipping creation", transactionId);
-            return;
+            return ;
         }
 
-        // creates new case and open a history
+        // NOTE: newCase creation opens a history
         var newCase = Case.from(payload);
 
-        // persist newCase and history via cascade.All
-        var saved = caseRepository.save(newCase);
-        log.info("Case created: id={}, transactionId={}, status={}", saved.getId(), saved.getTransactionId(), saved.getStatus());
+        // persist newCase, and history persisted by Spring via cascade.All
+        var newCasePersisted = caseRepository.save(newCase);
+        log.info("Case created: id={}, transactionId={}, status={}",
+                newCasePersisted.getId(), newCasePersisted.getTransactionId(), newCasePersisted.getStatus());
+
+        caseCreatedPublisher.publish(caseMapper.toCasePayload(newCasePersisted));
+        log.info("Event published for case creation: transactionId={}, caseId={}",
+                newCasePersisted.getTransactionId(), newCasePersisted.getId());
+
     }
 
     private boolean transactionExists(Long transactionId){
