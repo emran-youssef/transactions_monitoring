@@ -2,6 +2,7 @@ package com.eyatrooz.transaction_monitoring.case_management_service.controllers;
 
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CaseActionRequest;
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CaseResponse;
+import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;
 import com.eyatrooz.transaction_monitoring.case_management_service.services.CaseWorkflowService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,7 @@ public class CaseActionController {
     public ResponseEntity<CaseResponse> escalate(@PathVariable Long id, @Valid @RequestBody CaseActionRequest request) {
         var response = caseWorkflowService.escalate(id, request.getAnalyst(), request.getExplanation());
         return ResponseEntity.ok(response);
+
     }
+
 }

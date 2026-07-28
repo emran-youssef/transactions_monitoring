@@ -23,13 +23,17 @@ public class CaseWorkflowService {
     private final CaseRepository caseRepository;
     private final CaseHistoryMapper caseHistoryMapper;
 
-
     @Transactional
     public CaseResponse assign(Long caseId, String analyst){
+        log.info("===assigning case:{}===", caseId);
+
         var fetchedCase = loadCase(caseId);
+
+        // case status must be open befoe assignment
         requireStatus(fetchedCase, CaseStatus.OPEN);
 
         fetchedCase.setStatus(CaseStatus.UNDER_REVIEW);
+        fetchedCase.setAssignedAnalyst(analyst);
         fetchedCase.addHistory(CaseHistory.assigned(analyst));
 
         // persist the case, and history persisted by Spring via cascade.All
@@ -41,6 +45,8 @@ public class CaseWorkflowService {
 
     @Transactional
     public CaseResponse approve(Long caseId, String analyst, String explanation){
+        log.info("=== Approving case {} ===", caseId);
+
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);
@@ -58,6 +64,8 @@ public class CaseWorkflowService {
 
     @Transactional
     public CaseResponse escalate(Long caseId, String analyst, String explanation){
+        log.info("=== escalating case:{} ===", caseId);
+
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);

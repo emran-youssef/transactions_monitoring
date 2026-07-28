@@ -14,14 +14,14 @@ import java.util.UUID;
 public class EventMessage<T> {
     private String eventId;
     private String eventType;
-    private Instant occuredAt;
+    private Instant occurredAt;
     private T payload;
 
     public static <T> EventMessage<T> of(String eventType, T payload){
        return EventMessage.<T>builder()
                .eventId(UUID.randomUUID().toString())
                .eventType(eventType)
-               .occuredAt(Instant.now())
+               .occurredAt(Instant.now())
                .payload(payload)
                .build();
     }

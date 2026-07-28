@@ -26,6 +26,10 @@ public class CaseCreationService {
     public void processFlaggedTransaction(TransactionFlaggedPayload payload){
         Long transactionId = payload.getTransactionId();
 
+        log.info("==================================================");
+        log.info("Processing flagged transaction {}", payload.getTransactionId());
+        log.info("==================================================");
+
         // Idempotency check #1: event-level
         if(transactionExists(transactionId)) {
             log.warn("Flagged Event already recorded for transactionId={}", payload.getTransactionId());

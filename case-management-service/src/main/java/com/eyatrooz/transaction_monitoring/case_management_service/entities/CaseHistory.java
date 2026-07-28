@@ -45,11 +45,10 @@ public class CaseHistory {
         }
     }
 
-
     public static CaseHistory opened(Long transactionId){
         return CaseHistory.builder()
                 .eventType(CaseHistoryEventType.CASE_CREATED)
-                .comment("Case created for flagged transaction, transactionId=" + transactionId)
+                .comment("Case history created for the flagged transaction, transactionId=" + transactionId)
                 .build();
     }
 
@@ -59,7 +58,6 @@ public class CaseHistory {
                 .analyst(analyst)
                 .comment("Case assigned to analyst: "+analyst)
                 .build();
-
     }
 
     public static CaseHistory approved(String analyst, String explanation){

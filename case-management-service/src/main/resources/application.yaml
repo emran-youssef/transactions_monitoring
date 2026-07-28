@@ -27,7 +27,8 @@ spring:
 
 logging:
   level:
-    org.apache.kafka.common.config.AbstractConfig: WARN
-    org.apache.kafka.clients.consumer.internals: WARN
-    org.apache.kafka.clients.NetworkClient: WARN
-    org.apache.kafka.clients.Metadata: WARN
+    root: WARN
+    com.eyatrooz.transaction_monitoring.case_management_service: INFO
+
+server:
+  port: 8083

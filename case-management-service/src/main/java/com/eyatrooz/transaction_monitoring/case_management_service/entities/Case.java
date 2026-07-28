@@ -46,6 +46,7 @@ public class Case {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CaseHistory> history = new ArrayList<>();
 
@@ -65,7 +66,6 @@ public class Case {
         history.setCaseEntity(this);
         this.history.add(history);
     }
-
 
     public static Case createFrom(TransactionFlaggedPayload payload){
         var newCase = Case.builder()
