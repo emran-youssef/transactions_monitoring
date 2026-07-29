@@ -18,7 +18,7 @@ public class FlaggedTransactionConsumer {
     private final ObjectMapper objectMapper;
     private final CaseCreationService  caseCreationService;
 
-    @KafkaListener(topics = "transactions.flagged.v1", groupId = "case-management-service")
+    @KafkaListener(topics = KafkaTopics.FLAGGED_TRANSACTION, groupId = "case-management-service")
     public void consumeFlaggedTransaction(String message){
         EventMessage<TransactionFlaggedPayload> event;
         try {
