@@ -2,7 +2,6 @@ package com.eyatrooz.transaction_monitoring.case_management_service.controllers;
 
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CaseActionRequest;
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CaseResponse;
-import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;
 import com.eyatrooz.transaction_monitoring.case_management_service.services.CaseWorkflowService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/cases")
 @RequiredArgsConstructor
-public class CaseActionController {
+@RequestMapping("/api/cases")
+public class CaseWorkflowController {
 
     private final CaseWorkflowService caseWorkflowService;
 
@@ -35,6 +34,11 @@ public class CaseActionController {
         var response = caseWorkflowService.escalate(id, request.getAnalyst(), request.getExplanation());
         return ResponseEntity.ok(response);
 
+    }
+
+    @GetMapping("{/id}")
+    public ResponseEntity<CaseResponse> fetchCase(@PathVariable Long id){
+        return ResponseEntity.ok(caseWorkflowService.fetchCase(id));
     }
 
 }

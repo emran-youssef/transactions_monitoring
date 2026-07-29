@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
-public class CaseCreatedPayload {
+public class CasePayload {
     private Long id;
     private Long transactionId;
     private String accountId;

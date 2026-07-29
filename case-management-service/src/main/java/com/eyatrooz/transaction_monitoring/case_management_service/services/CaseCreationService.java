@@ -3,7 +3,8 @@ package com.eyatrooz.transaction_monitoring.case_management_service.services;
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.TransactionFlaggedPayload;
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.Case;
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.FlaggedTransactionEvent;
-import com.eyatrooz.transaction_monitoring.case_management_service.kafka.CaseCreatedPublisher;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.CasePublisher;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTopics;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.FlaggedTransactionEventRepository;
@@ -19,16 +20,15 @@ public class CaseCreationService {
 
     private final CaseMapper caseMapper;
     private final CaseRepository caseRepository;
-    private final CaseCreatedPublisher caseCreatedPublisher;
+    private final CasePublisher casePublisher;
     private final FlaggedTransactionEventRepository flaggedTransactionEventRepository;
 
     @Transactional
     public void processFlaggedTransaction(TransactionFlaggedPayload payload){
-        Long transactionId = payload.getTransactionId();
 
-        log.info("==================================================");
-        log.info("Processing flagged transaction {}", payload.getTransactionId());
-        log.info("==================================================");
+        log.info("----Processing flagged transaction {} -----", payload.getTransactionId());
+
+        Long transactionId = payload.getTransactionId();
 
         // Idempotency check #1: event-level
         if(transactionExists(transactionId)) {
@@ -45,7 +45,7 @@ public class CaseCreationService {
             return ;
         }
 
-        // NOTE: newCase creation opens a history
+        // NOTE: newCase creation opens a history as well
         var newCase = Case.createFrom(payload);
 
         // persist newCase, and history persisted by Spring via cascade.All
@@ -53,12 +53,14 @@ public class CaseCreationService {
         log.info("Case created: id={}, transactionId={}, status={}",
                 newCasePersisted.getId(), newCasePersisted.getTransactionId(), newCasePersisted.getStatus());
 
-        caseCreatedPublisher.publish(caseMapper.toCasePayload(newCasePersisted));
+        casePublisher.publish(KafkaTopics.CASE_CREATED, caseMapper.toCasePayload(newCasePersisted));
         log.info("Event published for case creation: transactionId={}, caseId={}",
                 newCasePersisted.getTransactionId(), newCasePersisted.getId());
 
     }
 
+
+    // --helpers
     private boolean transactionExists(Long transactionId){
         return flaggedTransactionEventRepository.existsByTransactionId(transactionId);
     }

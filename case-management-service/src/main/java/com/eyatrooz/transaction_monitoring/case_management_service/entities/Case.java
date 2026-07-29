@@ -62,6 +62,11 @@ public class Case {
         }
     }
 
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
+
     public void addHistory(CaseHistory history) {
         history.setCaseEntity(this);
         this.history.add(history);

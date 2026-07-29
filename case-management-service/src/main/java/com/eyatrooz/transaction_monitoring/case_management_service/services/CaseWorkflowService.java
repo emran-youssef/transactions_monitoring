@@ -6,6 +6,8 @@ import com.eyatrooz.transaction_monitoring.case_management_service.entities.Case
 import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseStatus;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.CaseNotFoundException;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.IllegalCaseTransitionException;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.CasePublisher;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTopics;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseHistoryMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;
@@ -20,12 +22,13 @@ import org.springframework.stereotype.Service;
 public class CaseWorkflowService {
 
     private final CaseMapper caseMapper;
+    private final CasePublisher casePublisher;
     private final CaseRepository caseRepository;
     private final CaseHistoryMapper caseHistoryMapper;
 
     @Transactional
     public CaseResponse assign(Long caseId, String analyst){
-        log.info("===assigning case:{}===", caseId);
+        log.info("== assigning case:{} ==", caseId);
 
         var fetchedCase = loadCase(caseId);
 
@@ -39,6 +42,10 @@ public class CaseWorkflowService {
         // persist the case, and history persisted by Spring via cascade.All
         var persisted = caseRepository.save(fetchedCase);
         log.info("Case assigned: id={}, analyst={}, status={}", persisted.getId(), analyst, persisted.getStatus());
+
+        casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
+        log.info("Event published for case assignment: transactionId={}, caseId={}",
+                persisted.getTransactionId(), persisted.getId());
 
         return caseMapper.toResponse(persisted);
     }
@@ -59,13 +66,16 @@ public class CaseWorkflowService {
         var persisted = caseRepository.save(fetchedCase);
         log.info("Case approved: id={}, analyst={}, status={}", persisted.getId(), analyst, persisted.getStatus());
 
+        casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
+        log.info("Event published for case approvement: transactionId={}, caseId={}",
+                persisted.getTransactionId(), persisted.getId());
+
         return caseMapper.toResponse(persisted);
     }
 
     @Transactional
     public CaseResponse escalate(Long caseId, String analyst, String explanation){
         log.info("=== escalating case:{} ===", caseId);
-
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);
@@ -78,10 +88,21 @@ public class CaseWorkflowService {
         var persisted = caseRepository.save(fetchedCase);
         log.info("Case escalated: id={}, analyst={}, status={}", persisted.getId(), analyst, persisted.getStatus());
 
+        casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
+        log.info("Event published for case escalation: transactionId={}, caseId={}",
+                persisted.getTransactionId(), persisted.getId());
+
         return caseMapper.toResponse(persisted);
     }
 
+    public CaseResponse fetchCase(Long id){
+        var fetchedCase = caseRepository.findById(id)
+                .orElseThrow(()-> new CaseNotFoundException("Case not found!"));
+        return caseMapper.toResponse(fetchedCase);
+    }
 
+
+    // -- helpers
     private Case loadCase(Long caseId){
         return caseRepository.findById(caseId)
                 .orElseThrow(()->new CaseNotFoundException("Case not found, caseId="+ caseId));

@@ -1,6 +1,6 @@
 package com.eyatrooz.transaction_monitoring.case_management_service.kafka;
 
-import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CaseCreatedPayload;
+import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CasePayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,23 +11,21 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CaseCreatedPublisher {
+public class CasePublisher {
 
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafka;
 
-    private static final String TOPIC = "cases.created.v1";
-
-    public void publish(CaseCreatedPayload response){
-        var event = EventMessage.of(TOPIC, response);
+    public void publish(String topic, CasePayload response){
+        var event = EventMessage.of(topic, response);
 
         try {
             String json = objectMapper.writeValueAsString(event);
-            kafka.send(TOPIC, response.getAccountId(), json);
-            log.info("Published event: type={}, accountId={}", TOPIC, response.getAccountId());
+            kafka.send(topic, response.getAccountId(), json);
+            log.info("Published event: type={}, accountId={}", topic, response.getAccountId());
 
         } catch (JacksonException ex) {
-            log.error("Failed to serialize event: type={}, accountId={}", TOPIC, response.getAccountId(), ex);
+            log.error("Failed to serialize event: type={}, accountId={}", topic, response.getAccountId(), ex);
         }
     }
 
