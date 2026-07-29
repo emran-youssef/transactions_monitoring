@@ -5,7 +5,8 @@ public final class KafkaTopics {
     public static final String CASE_UPDATED = "cases.updated.v1";
     public static final String FLAGGED_TRANSACTION = "transactions.flagged.v1";
 
-    private KafkaTopics() { }  // prevents instantiation — this class is just a constants holder
+    // prevents instantiation — this class is just a constants holder
+    private KafkaTopics() { }
 }
 
 

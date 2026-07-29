@@ -76,7 +76,7 @@ transactions-monitoring-platform/
 │   │   ├── application.yaml
 │   │   └── db/migration/
 │   └── pom.xml
-├── case-management-service/       (planned)
+├── case-management-service/
 ├── audit-service/                 (planned)
 ├── docker-compose.yml
 └── README.md
@@ -110,6 +110,9 @@ mvn flyway:migrate
 
 cd ../../rule-engine-service
 mvn flyway:migrate
+
+cd ../../case-management-service
+mvn flyway:migrate
 ```
 
 ### 3. Run a service
@@ -129,7 +132,7 @@ Each service runs on its own port to avoid collisions locally (e.g. Transaction 
 3. **Rule Engine Service** consumes the event, records it in its local transaction history, and evaluates it against all registered rule strategies.
 4. Each strategy produces a risk score and verdict; the executor aggregates these into an overall decision and persists the full evaluation (including which rules triggered and why).
 5. If the aggregate risk crosses the configured threshold, Rule Engine Service publishes `transactions.flagged.v1`.
-6. *(Planned)* Case Management Service consumes flagged events and opens investigation cases for analysts.
+6. Case Management Service consumes flagged events and opens investigation cases for analysts.
 7. *(Planned)* Audit Service consumes every event across the platform to build an immutable compliance trail.
 
 ---
@@ -141,7 +144,7 @@ The platform is being built incrementally across eight milestones, each independ
 - [x] **Milestone 1** — Transaction Service (standalone, REST + persistence)
 - [x] **Milestone 2** — Kafka integration (event publishing from Transaction Service)
 - [x] **Milestone 3** — Rule Engine Service (Kafka consumer, Strategy-pattern rule evaluation)
-- [ ] **Milestone 4** — Case Management Service — *in progress*
+- [x] Milestone 4 — Case Management Service
 - [ ] **Milestone 5** — Audit Service
 - [ ] **Milestone 6** — Security (JWT authentication, RBAC)
 - [ ] **Milestone 7** — Production hardening (idempotency, DLQ, Outbox pattern)

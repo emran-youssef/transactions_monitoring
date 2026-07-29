@@ -52,7 +52,7 @@ public class CaseWorkflowService {
 
     @Transactional
     public CaseResponse approve(Long caseId, String analyst, String explanation){
-        log.info("=== Approving case {} ===", caseId);
+        log.info("== Approving case {} ==", caseId);
 
         var fetchedCase = loadCase(caseId);
 
@@ -75,7 +75,7 @@ public class CaseWorkflowService {
 
     @Transactional
     public CaseResponse escalate(Long caseId, String analyst, String explanation){
-        log.info("=== escalating case:{} ===", caseId);
+        log.info("== escalating case:{} ==", caseId);
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);
@@ -100,7 +100,6 @@ public class CaseWorkflowService {
                 .orElseThrow(()-> new CaseNotFoundException("Case not found!"));
         return caseMapper.toResponse(fetchedCase);
     }
-
 
     // -- helpers
     private Case loadCase(Long caseId){

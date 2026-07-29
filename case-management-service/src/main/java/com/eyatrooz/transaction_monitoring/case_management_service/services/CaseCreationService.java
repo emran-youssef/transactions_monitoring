@@ -19,15 +19,14 @@ import org.springframework.stereotype.Service;
 public class CaseCreationService {
 
     private final CaseMapper caseMapper;
-    private final CaseRepository caseRepository;
     private final CasePublisher casePublisher;
+    private final CaseRepository caseRepository;
     private final FlaggedTransactionEventRepository flaggedTransactionEventRepository;
 
     @Transactional
     public void processFlaggedTransaction(TransactionFlaggedPayload payload){
 
-        log.info("----Processing flagged transaction {} -----", payload.getTransactionId());
-
+        log.info("===Processing flagged transaction {} ===", payload.getTransactionId());
         Long transactionId = payload.getTransactionId();
 
         // Idempotency check #1: event-level
@@ -58,7 +57,6 @@ public class CaseCreationService {
                 newCasePersisted.getTransactionId(), newCasePersisted.getId());
 
     }
-
 
     // --helpers
     private boolean transactionExists(Long transactionId){
