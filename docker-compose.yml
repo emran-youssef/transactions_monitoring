@@ -38,6 +38,18 @@ services:
     volumes:
       - mysql_case_management_data:/var/lib/mysql
 
+  mysql-audit:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: "0000"
+      MYSQL_DATABASE: audit_db
+      MYSQL_USER: "eyatrooz"
+      MYSQL_PASSWORD: "0000"
+    ports:
+      - "3310:3306"
+    volumes:
+      - mysql_audit_data:/var/lib/mysql
+
 
   # kafka broker's self-config
   kafka:
@@ -58,4 +70,5 @@ volumes:
   mysql_transactions-data:
   mysql_rule_engine_data:
   mysql_case_management_data:
+  mysql_audit_data:
 
