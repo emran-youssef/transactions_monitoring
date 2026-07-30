@@ -6,7 +6,7 @@ import com.eyatrooz.transaction_monitoring.case_management_service.entities.Case
 import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseStatus;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.CaseNotFoundException;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.IllegalCaseTransitionException;
-import com.eyatrooz.transaction_monitoring.case_management_service.kafka.CasePublisher;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.publisher.CasePublisher;
 import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTopics;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseHistoryMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseMapper;

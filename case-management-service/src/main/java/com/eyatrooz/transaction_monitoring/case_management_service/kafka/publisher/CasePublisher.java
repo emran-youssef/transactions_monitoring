@@ -1,4 +1,4 @@
-package com.eyatrooz.transaction_monitoring.case_management_service.kafka;
+package com.eyatrooz.transaction_monitoring.case_management_service.kafka.publisher;
 
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CasePayload;
 import lombok.RequiredArgsConstructor;

@@ -3,7 +3,7 @@ package com.eyatrooz.transaction_monitoring.case_management_service.services;
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.TransactionFlaggedPayload;
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.Case;
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.FlaggedTransactionEvent;
-import com.eyatrooz.transaction_monitoring.case_management_service.kafka.CasePublisher;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.publisher.CasePublisher;
 import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTopics;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;

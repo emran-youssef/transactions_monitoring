@@ -1,6 +1,7 @@
 package com.eyatrooz.transaction_monitoring.audit_service.kafka.consumer;
 
 import com.eyatrooz.transaction_monitoring.audit_service.kafka.EventMessage;
+import com.eyatrooz.transaction_monitoring.audit_service.kafka.KafkaTopics;
 import com.eyatrooz.transaction_monitoring.audit_service.kafka.payload.CaseCreatedPayload;
 import com.eyatrooz.transaction_monitoring.audit_service.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class CaseCreatedAuditConsumer {
     private final ObjectMapper objectMapper;
     private final AuditLogService auditLogService;
 
-    @KafkaListener(topics = "cases.created.v1", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = KafkaTopics.CASE_CREATED, groupId = "${spring.kafka.consumer.group-id}")
     public void onCaseCreated(String message) {
         EventMessage<CaseCreatedPayload> event;
         try {
