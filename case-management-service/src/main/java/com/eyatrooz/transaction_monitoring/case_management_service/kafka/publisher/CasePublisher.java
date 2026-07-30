@@ -1,6 +1,7 @@
 package com.eyatrooz.transaction_monitoring.case_management_service.kafka.publisher;
 
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.CasePayload;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.EventMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

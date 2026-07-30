@@ -2,6 +2,8 @@ package com.eyatrooz.transaction_monitoring.case_management_service.kafka.consum
 
 
 import com.eyatrooz.transaction_monitoring.case_management_service.dtos.TransactionFlaggedPayload;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.EventMessage;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTopics;
 import com.eyatrooz.transaction_monitoring.case_management_service.services.CaseCreationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
