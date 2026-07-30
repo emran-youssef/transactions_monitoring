@@ -1,0 +1,22 @@
+package com.eyatrooz.transaction_monitoring.audit_service.kafka;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.Instant;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventMessage<T> {
+
+    private String eventId;
+    private String eventType;
+    private Instant occurredAt;
+    private T payload;
+}

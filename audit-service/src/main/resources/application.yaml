@@ -1,3 +1,28 @@
 spring:
   application:
     name: audit-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3310/audit_db
+    username: "eyatrooz"
+    password: "0000"
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: audit-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8084
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.springframework.kafka: WARN

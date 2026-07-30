@@ -24,18 +24,6 @@ public class TransactionCreatedConsumer {
     private final RuleEvaluationService ruleEvaluationService;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    /**
-     * Consumes transaction creation events from Kafka.
-
-     * Flow:
-     * 1. Receives JSON message from transactions.created.v1 topic.
-     * 2. Deserializes JSON into EventMessage<TransactionCreatedPayload>.
-     * 3. Processes the transaction event.
-
-     * Note:
-     * constructParametricType() is required because Java generic types are erased
-     * at runtime, so Jackson needs the payload type explicitly.
-     */
 
     @KafkaListener(topics = "transactions.created.v1", groupId = "${spring.kafka.consumer.group-id}")
     public void onTransactionCreated(String message){
