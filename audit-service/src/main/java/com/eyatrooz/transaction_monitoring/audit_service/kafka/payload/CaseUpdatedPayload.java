@@ -12,6 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class CaseUpdatedPayload {
-
-    private String caseId;
+    private String id;
 }

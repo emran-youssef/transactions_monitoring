@@ -36,7 +36,7 @@ public class CaseWorkflowController {
 
     }
 
-    @GetMapping("{/id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CaseResponse> fetchCase(@PathVariable Long id){
         return ResponseEntity.ok(caseWorkflowService.fetchCase(id));
     }

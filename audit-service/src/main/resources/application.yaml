@@ -20,7 +20,8 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 server:
-  port: 8084
+  port: 8085
+
 
 logging:
   level:

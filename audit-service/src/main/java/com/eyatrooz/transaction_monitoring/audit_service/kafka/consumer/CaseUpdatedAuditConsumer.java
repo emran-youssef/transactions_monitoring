@@ -1,7 +1,7 @@
-package com.eyatrooz.transaction_monitoring.audit_service.consumer;
+package com.eyatrooz.transaction_monitoring.audit_service.kafka.consumer;
 
 import com.eyatrooz.transaction_monitoring.audit_service.kafka.EventMessage;
-import com.eyatrooz.transaction_monitoring.audit_service.kafka.payload.CaseCreatedPayload;
+import com.eyatrooz.transaction_monitoring.audit_service.kafka.payload.CaseUpdatedPayload;
 import com.eyatrooz.transaction_monitoring.audit_service.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,25 +13,25 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CaseCreatedAuditConsumer {
+public class CaseUpdatedAuditConsumer {
 
     private final ObjectMapper objectMapper;
     private final AuditLogService auditLogService;
 
-    @KafkaListener(topics = "cases.created.v1", groupId = "${spring.kafka.consumer.group-id}")
-    public void onCaseCreated(String message) {
-        EventMessage<CaseCreatedPayload> event;
+    @KafkaListener(topics = "cases.updated.v1", groupId = "${spring.kafka.consumer.group-id}")
+    public void onCaseUpdated(String message) {
+        EventMessage<CaseUpdatedPayload> event;
         try {
             event = objectMapper.readValue(
                     message,
-                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, CaseCreatedPayload.class)
+                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, CaseUpdatedPayload.class)
             );
         } catch (JacksonException ex) {
-            log.error("Failed to deserialize cases.created.v1 message: {}", message, ex);
+            log.error("Failed to deserialize cases.updated.v1 message: {}", message, ex);
             return;
         }
 
-        String entityId = event.getPayload().getCaseId();
-        auditLogService.record(event, entityId);
+        String entityId = event.getPayload().getId();
+        auditLogService.record(event, entityId, message);
     }
 }

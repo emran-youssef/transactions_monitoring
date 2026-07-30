@@ -12,6 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class TransactionFlaggedPayload {
-
     private String transactionId;
 }

@@ -1,4 +1,4 @@
-package com.eyatrooz.transaction_monitoring.audit_service.consumer;
+package com.eyatrooz.transaction_monitoring.audit_service.kafka.consumer;
 
 import com.eyatrooz.transaction_monitoring.audit_service.kafka.EventMessage;
 import com.eyatrooz.transaction_monitoring.audit_service.kafka.payload.TransactionFlaggedPayload;
@@ -32,6 +32,6 @@ public class TransactionFlaggedAuditConsumer {
         }
 
         String entityId = event.getPayload().getTransactionId();
-        auditLogService.record(event, entityId);
+        auditLogService.record(event, entityId, message);
     }
 }
