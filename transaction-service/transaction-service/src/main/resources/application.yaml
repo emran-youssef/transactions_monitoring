@@ -20,4 +20,7 @@ spring:
 logging:
   level:
     org.apache.kafka.common.config.AbstractConfig: WARN
-    
+
+jwt:
+  secret: kodDkBDlDamLV86p+r0/TH8Hli4gag7hhGrnRwksisc=
+  expiration-ms: 3600000
