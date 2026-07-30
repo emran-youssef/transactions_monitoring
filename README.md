@@ -77,7 +77,7 @@ transactions-monitoring-platform/
 │   │   └── db/migration/
 │   └── pom.xml
 ├── case-management-service/
-├── audit-service/                 (planned)
+├── audit-service/
 ├── docker-compose.yml
 └── README.md
 ```
@@ -133,7 +133,7 @@ Each service runs on its own port to avoid collisions locally (e.g. Transaction 
 4. Each strategy produces a risk score and verdict; the executor aggregates these into an overall decision and persists the full evaluation (including which rules triggered and why).
 5. If the aggregate risk crosses the configured threshold, Rule Engine Service publishes `transactions.flagged.v1`.
 6. Case Management Service consumes flagged events and opens investigation cases for analysts.
-7. *(Planned)* Audit Service consumes every event across the platform to build an immutable compliance trail.
+7. + Audit Service consumes all four topics (`transactions.created.v1`, `transactions.flagged.v1`, `cases.created.v1`, `cases.updated.v1`) and persists each as an immutable, append-only row — storing the raw event JSON verbatim, indexed by `entity_id` and `event_type` for traceability.
 
 ---
 
@@ -145,7 +145,7 @@ The platform is being built incrementally across eight milestones, each independ
 - [x] **Milestone 2** — Kafka integration (event publishing from Transaction Service)
 - [x] **Milestone 3** — Rule Engine Service (Kafka consumer, Strategy-pattern rule evaluation)
 - [x] Milestone 4 — Case Management Service
-- [ ] **Milestone 5** — Audit Service
+- [x] Milestone 5 — Audit Service
 - [ ] **Milestone 6** — Security (JWT authentication, RBAC)
 - [ ] **Milestone 7** — Production hardening (idempotency, DLQ, Outbox pattern)
 - [ ] **Milestone 8** — Full containerization of all services
