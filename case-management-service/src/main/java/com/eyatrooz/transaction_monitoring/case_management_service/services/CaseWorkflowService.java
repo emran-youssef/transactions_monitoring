@@ -5,6 +5,7 @@ import com.eyatrooz.transaction_monitoring.case_management_service.entities.Case
 import com.eyatrooz.transaction_monitoring.case_management_service.entities.CaseHistory;
 import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseStatus;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.CaseNotFoundException;
+import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.CaseNotAssignedException;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.IllegalCaseTransitionException;
 import com.eyatrooz.transaction_monitoring.case_management_service.kafka.publisher.CasePublisher;
 import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTopics;
@@ -51,20 +52,20 @@ public class CaseWorkflowService {
     }
 
     @Transactional
-    public CaseResponse approve(Long caseId, String analyst, String explanation){
+    public CaseResponse approve(Long caseId, String currentUsername, String explanation){
         log.info("== Approving case {} ==", caseId);
 
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);
-        requireAssignedAnalyst(fetchedCase, analyst);
+        requireAssignedAnalyst(fetchedCase, currentUsername);
 
         fetchedCase.setStatus(CaseStatus.APPROVED);
-        fetchedCase.addHistory(CaseHistory.approved(analyst, explanation));
+        fetchedCase.addHistory(CaseHistory.approved(currentUsername, explanation));
 
         // persist the case, and history persisted by Spring via cascade.All
         var persisted = caseRepository.save(fetchedCase);
-        log.info("Case approved: id={}, analyst={}, status={}", persisted.getId(), analyst, persisted.getStatus());
+        log.info("Case approved: id={}, analyst={}, status={}", persisted.getId(), currentUsername, persisted.getStatus());
 
         casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
         log.info("Event published for case approvement: transactionId={}, caseId={}",
@@ -74,19 +75,19 @@ public class CaseWorkflowService {
     }
 
     @Transactional
-    public CaseResponse escalate(Long caseId, String analyst, String explanation){
+    public CaseResponse escalate(Long caseId, String currentUsername, String explanation){
         log.info("== escalating case:{} ==", caseId);
         var fetchedCase = loadCase(caseId);
 
         requireStatus(fetchedCase, CaseStatus.UNDER_REVIEW);
-        requireAssignedAnalyst(fetchedCase, analyst);
+        requireAssignedAnalyst(fetchedCase, currentUsername);
 
         fetchedCase.setStatus(CaseStatus.ESCALATED);
-        fetchedCase.addHistory(CaseHistory.escalated(analyst, explanation));
+        fetchedCase.addHistory(CaseHistory.escalated(currentUsername, explanation));
 
         // persist the case, and history persisted by Spring via cascade.All
         var persisted = caseRepository.save(fetchedCase);
-        log.info("Case escalated: id={}, analyst={}, status={}", persisted.getId(), analyst, persisted.getStatus());
+        log.info("Case escalated: id={}, analyst={}, status={}", persisted.getId(), currentUsername, persisted.getStatus());
 
         casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
         log.info("Event published for case escalation: transactionId={}, caseId={}",
@@ -114,9 +115,9 @@ public class CaseWorkflowService {
                             " but was=" + caseEntity.getStatus());
     }
 
-    private void requireAssignedAnalyst(Case caseEntity, String analyst) {
-        if(!analyst.equals(caseEntity.getAssignedAnalyst()))
-            throw new IllegalCaseTransitionException("Only assigned analyst can perform this action");
+    private void requireAssignedAnalyst(Case caseEntity, String currentUsername) {
+        if(!currentUsername.equals(caseEntity.getAssignedAnalyst()))
+            throw new CaseNotAssignedException("Case is not assigned to this analyst");
     }
 }
 

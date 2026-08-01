@@ -21,9 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String BEARER_PREFIX = "Bearer ";
-
     private final JwtService jwtService;
+    private static final String BEARER_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(
@@ -41,11 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
         try {
+
             jwtService.validateToken(token);
 
             String username = jwtService.extractUsername(token);
             String role = jwtService.extractRole(token);
-
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     username,
                     null,
