@@ -6,8 +6,8 @@ import com.eyatrooz.transaction_monitoring.transaction_service.services.Transact
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +21,7 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('SYSTEM') or hasRole('ADMIN')")
     public ResponseEntity<TransactionResponse> create(@Valid @RequestBody TransactionRequest request){
         var response = transactionService.createTransaction(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
