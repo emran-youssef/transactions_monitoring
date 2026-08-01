@@ -4,6 +4,7 @@ import com.eyatrooz.transaction_monitoring.case_management_service.dtos.ErrorRes
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -57,5 +58,11 @@ public class GlobalExceptionHandler {
                 Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error", Map.of()
         );
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "Forbidden", "message", "You do not have permission to perform this action"));
     }
 }
