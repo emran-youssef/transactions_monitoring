@@ -15,11 +15,15 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class FlaggedTransactionPublisher{
 
+      /**
+     * THIS CLASS NEVER USED NOW, THE OUTBOX PUBLISHER HANDLE THE PUBLISHING
+     */
+
     private final ObjectMapper objectMapper;
     private final RuleEvaluationMapper ruleEvaluationMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private static final String TOPIC = "transactions.flagged.v1";
+    private static final String TOPIC = KafkaTopic.TOPIC;
 
     public void publishFlagged(RuleEvaluation ruleEvaluation){
         var payload = ruleEvaluationMapper.toFlaggedPayload(ruleEvaluation);
