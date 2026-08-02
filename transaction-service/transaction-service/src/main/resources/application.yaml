@@ -19,7 +19,12 @@ spring:
 
 logging:
   level:
-    org.apache.kafka.common.config.AbstractConfig: WARN
+    root: WARN
+    com.eyatrooz.transaction_monitoring: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.apache.kafka: WARN
+    com.zaxxer.hikari: WARN
 
 jwt:
   secret: kodDkBDlDamLV86p+r0/TH8Hli4gag7hhGrnRwksisc=

@@ -13,18 +13,21 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class TransactionEventPublisher {
 
-    private static final String TOPIC = "transactions.created.v1";
+      /**
+     * THIS CLASS IS NEVER USED NOW, THE OUTBOX PATTERN HANDLE THE PUBLISHING
+     */
+
+    private static final String TOPIC = KafkaTopic.TOPIC;
 
     private final ObjectMapper objectMapper;
-    private final KafkaTemplate<String, String> kafkaTemplate;
-
+    private final KafkaTemplate<String, String> kafka;
 
     public void publishTransactionCreated(TransactionResponse response){
         var event = EventMessage.of(TOPIC, response);
         try {
 
             String json = objectMapper.writeValueAsString(event);
-            kafkaTemplate.send(TOPIC, response.getAccountId(), json);
+            kafka.send(TOPIC, response.getAccountId(), json);
             log.info("Published event: type={}, accountId={}", TOPIC, response.getAccountId());
 
         } catch (JacksonException e) {
