@@ -25,6 +25,5 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> create(@Valid @RequestBody TransactionRequest request){
         var response = transactionService.createTransaction(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
     }
 }
