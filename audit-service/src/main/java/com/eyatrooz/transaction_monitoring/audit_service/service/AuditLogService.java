@@ -14,22 +14,16 @@ import org.springframework.stereotype.Component;
 public class AuditLogService {
     private final AuditLogRepository auditLogRepository;
 
-    public void record(EventMessage<?> eventMessage, String entityId, String kafkaPayload) {
-        if (auditLogRepository.findByEventId(eventMessage.getEventId()).isPresent()) {
-            log.debug("eventId={} already recorded, skipping", eventMessage.getEventId());
+    public void record(EventMessage<?> message, String entityId, String payload) {
+        if (auditLogRepository.findByEventId(message.getEventId()).isPresent()) {
+            log.debug("eventId={} already recorded, skipping", message.getEventId());
             return;
         }
 
-        AuditLogEntry entry = AuditLogEntry.builder()
-                .eventId(eventMessage.getEventId())
-                .eventType(eventMessage.getEventType())
-                .entityId(entityId)
-                .occurredAt(eventMessage.getOccurredAt())
-                .payload(kafkaPayload)
-                .build();
+        var audit = AuditLogEntry.from(message, entityId, payload);
 
-        auditLogRepository.save(entry);
+        auditLogRepository.save(audit);
         log.info("Recorded audit log entry eventId={} eventType={} entityId={}",
-                eventMessage.getEventId(), eventMessage.getEventType(), entityId);
+                message.getEventId(), message.getEventType(), entityId);
     }
 }

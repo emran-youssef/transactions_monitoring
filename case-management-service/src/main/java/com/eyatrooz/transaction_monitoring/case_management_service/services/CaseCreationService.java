@@ -31,6 +31,7 @@ public class CaseCreationService {
     @Transactional
     public void processFlaggedTransaction(TransactionFlaggedPayload transactionFlagged){
         log.info("=== Processing flagged transaction {} ===", transactionFlagged.getTransactionId());
+
         Long transactionId = transactionFlagged.getTransactionId();
 
         // Idempotency check #1: event-level

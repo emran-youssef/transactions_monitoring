@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.audit_service.entity;
 
+import com.eyatrooz.transaction_monitoring.audit_service.kafka.EventMessage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -49,4 +49,15 @@ public class AuditLogEntry {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payload", nullable = false, columnDefinition = "json")
     private String payload;
+
+
+    public static AuditLogEntry from(EventMessage<?> event, String entityId, String payload ){
+        return AuditLogEntry.builder()
+                .eventId(event.getEventId())
+                .eventType(event.getEventType())
+                .entityId(entityId)
+                .occurredAt(event.getOccurredAt())
+                .payload(payload)
+                .build();
+    }
 }
