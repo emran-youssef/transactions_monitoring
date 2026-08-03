@@ -28,7 +28,11 @@ spring:
 logging:
   level:
     root: WARN
-    com.eyatrooz.transaction_monitoring.case_management_service: INFO
+    com.eyatrooz.transaction_monitoring: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.apache.kafka: WARN
+    com.zaxxer.hikari: WARN
 
 server:
   port: 8083
