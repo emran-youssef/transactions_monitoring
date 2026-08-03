@@ -1,4 +1,4 @@
-package com.eyatrooz.transaction_monitoring.rule_engine_service.kafka;
+package com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.publisher;
 
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.OutboxEvent;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.OutboxEventsRepository;

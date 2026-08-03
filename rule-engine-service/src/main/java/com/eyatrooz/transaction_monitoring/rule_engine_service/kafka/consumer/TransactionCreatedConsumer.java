@@ -1,10 +1,10 @@
-package com.eyatrooz.transaction_monitoring.rule_engine_service.kafka;
+package com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.consumer;
 
 import com.eyatrooz.transaction_monitoring.rule_engine_service.dtos.TransactionCreatedPayload;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.TransactionHistory;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers.EventMessage;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers.KafkaTopic;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.TransactionHistoryRepository;
-import com.eyatrooz.transaction_monitoring.rule_engine_service.rules.RuleContext;
-import com.eyatrooz.transaction_monitoring.rule_engine_service.rules.RuleExecutor;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.services.RuleEvaluationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

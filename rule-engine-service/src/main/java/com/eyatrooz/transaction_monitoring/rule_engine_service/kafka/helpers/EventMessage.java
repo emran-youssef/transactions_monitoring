@@ -1,6 +1,5 @@
-package com.eyatrooz.transaction_monitoring.rule_engine_service.kafka;
+package com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers;
 
-import com.eyatrooz.transaction_monitoring.rule_engine_service.dtos.TransactionCreatedPayload;
 import lombok.*;
 
 import java.time.Instant;

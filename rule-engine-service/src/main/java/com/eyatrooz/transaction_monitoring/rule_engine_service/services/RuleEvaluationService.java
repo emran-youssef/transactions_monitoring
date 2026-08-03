@@ -1,12 +1,12 @@
 package com.eyatrooz.transaction_monitoring.rule_engine_service.services;
 
-import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.OutboxEvent;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.RuleEvaluation;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.RuleEvaluationResult;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.TransactionHistory;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.enums.RuleName;
-import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.EventMessage;
-import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.KafkaTopic;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers.AggregateType;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers.KafkaTopic;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers.OutboxEventFactory;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.mappers.RuleEvaluationMapper;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.OutboxEventsRepository;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.RuleEvaluationRepository;
@@ -20,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -34,15 +32,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RuleEvaluationService {
 
-    private final ObjectMapper objectMapper;
     private final RuleExecutor ruleExecutor;
     private final RuleEvaluationMapper ruleEvaluationMapper;
     private final OutboxEventsRepository outboxEventsRepository;
     private final RuleEvaluationRepository ruleEvaluationRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
+    private final OutboxEventFactory outboxEventFactory;
 
     private static final String TOPIC = KafkaTopic.TOPIC;
-    private static final String AGGREGATE_TYPE = "RuleEvaluation";
 
     @Value("${rules.recent-history-window-hours:24}")
     private long recentHistoryWindowHours;
@@ -69,17 +66,8 @@ public class RuleEvaluationService {
 
         if(ruleEvaluation.getFlagged()) {
             var flaggedPayload = ruleEvaluationMapper.toFlaggedPayload(ruleEvaluation);
-            var event = EventMessage.of(TOPIC, flaggedPayload);
-
-            try {
-                var payload = objectMapper.writeValueAsString(event);
-                var outboxEvent = OutboxEvent.from(AGGREGATE_TYPE, transaction.getTransactionId().toString(), TOPIC, payload);
-                outboxEventsRepository.save(outboxEvent);
-                log.info("Outbox event recorded: type={}, transactionId={}", TOPIC, transaction.getTransactionId());
-
-            } catch (JacksonException e) {
-                throw new IllegalStateException("Failed to serialize outbox event for rule evaluation transaction id=" + transaction.getTransactionId(), e);
-            }
+            outboxEventsRepository.save(outboxEventFactory.create(AggregateType.RULE_EVALUATION, transaction.getTransactionId().toString(), TOPIC, flaggedPayload));
+            log.info("Outbox event recorded: type={}, transactionId={}", TOPIC, transaction.getTransactionId());
         }
     }
 
