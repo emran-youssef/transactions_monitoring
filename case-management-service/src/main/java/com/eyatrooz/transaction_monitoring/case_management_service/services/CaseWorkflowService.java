@@ -7,15 +7,18 @@ import com.eyatrooz.transaction_monitoring.case_management_service.enums.CaseSta
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.CaseNotFoundException;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.CaseNotAssignedException;
 import com.eyatrooz.transaction_monitoring.case_management_service.exceptions.IllegalCaseTransitionException;
-import com.eyatrooz.transaction_monitoring.case_management_service.kafka.publisher.CasePublisher;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.AggregateType;
 import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTopics;
+import com.eyatrooz.transaction_monitoring.case_management_service.kafka.OutboxEventFactory;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseHistoryMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseMapper;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;
+import com.eyatrooz.transaction_monitoring.case_management_service.repositories.OutboxEventsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 
 @Slf4j
 @Service
@@ -23,9 +26,11 @@ import org.springframework.stereotype.Service;
 public class CaseWorkflowService {
 
     private final CaseMapper caseMapper;
-    private final CasePublisher casePublisher;
     private final CaseRepository caseRepository;
     private final CaseHistoryMapper caseHistoryMapper;
+    private final OutboxEventFactory outboxEventFactory;
+    private final OutboxEventsRepository outboxEventRepository;
+
 
     @Transactional
     public CaseResponse assign(Long caseId, String analyst){
@@ -44,12 +49,14 @@ public class CaseWorkflowService {
         var persisted = caseRepository.save(fetchedCase);
         log.info("Case assigned: id={}, analyst={}, status={}", persisted.getId(), analyst, persisted.getStatus());
 
-        casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
-        log.info("Event published for case assignment: transactionId={}, caseId={}",
-                persisted.getTransactionId(), persisted.getId());
+        // for the event
+        var casePayload = caseMapper.toCasePayload(persisted);
+        outboxEventRepository.save(outboxEventFactory.create(AggregateType.CASE_UPDATE, persisted.getId().toString(), KafkaTopics.CASE_UPDATED, casePayload));
+        log.info("Outbox event recorded: type={}, accountId={}", KafkaTopics.CASE_UPDATED, persisted.getAccountId());
 
         return caseMapper.toResponse(persisted);
     }
+
 
     @Transactional
     public CaseResponse approve(Long caseId, String currentUsername, String explanation){
@@ -67,9 +74,9 @@ public class CaseWorkflowService {
         var persisted = caseRepository.save(fetchedCase);
         log.info("Case approved: id={}, analyst={}, status={}", persisted.getId(), currentUsername, persisted.getStatus());
 
-        casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
-        log.info("Event published for case approvement: transactionId={}, caseId={}",
-                persisted.getTransactionId(), persisted.getId());
+        var casePayload = caseMapper.toCasePayload(persisted);
+        outboxEventRepository.save(outboxEventFactory.create(AggregateType.CASE_UPDATE, persisted.getId().toString(), KafkaTopics.CASE_UPDATED, casePayload));
+        log.info("Outbox event recorded: type={}, accountId={}", KafkaTopics.CASE_UPDATED, persisted.getAccountId());
 
         return caseMapper.toResponse(persisted);
     }
@@ -89,9 +96,9 @@ public class CaseWorkflowService {
         var persisted = caseRepository.save(fetchedCase);
         log.info("Case escalated: id={}, analyst={}, status={}", persisted.getId(), currentUsername, persisted.getStatus());
 
-        casePublisher.publish(KafkaTopics.CASE_UPDATED, caseMapper.toCasePayload(persisted));
-        log.info("Event published for case escalation: transactionId={}, caseId={}",
-                persisted.getTransactionId(), persisted.getId());
+        var casePayload = caseMapper.toCasePayload(persisted);
+        outboxEventRepository.save(outboxEventFactory.create(AggregateType.CASE_UPDATE, persisted.getId().toString(), KafkaTopics.CASE_UPDATED, casePayload));
+        log.info("Outbox event recorded: type={}, accountId={}", KafkaTopics.CASE_UPDATED, persisted.getAccountId());
 
         return caseMapper.toResponse(persisted);
     }
