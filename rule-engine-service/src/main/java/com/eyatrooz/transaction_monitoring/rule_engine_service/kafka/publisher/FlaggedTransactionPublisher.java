@@ -12,7 +12,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class FlaggedTransactionPublisher{
 
@@ -24,7 +23,7 @@ public class FlaggedTransactionPublisher{
     private final RuleEvaluationMapper ruleEvaluationMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private static final String TOPIC = KafkaTopic.TOPIC;
+    private static final String TOPIC = KafkaTopic.TRANSACTION_FLAGGED;
 
     public void publishFlagged(RuleEvaluation ruleEvaluation){
         var payload = ruleEvaluationMapper.toFlaggedPayload(ruleEvaluation);

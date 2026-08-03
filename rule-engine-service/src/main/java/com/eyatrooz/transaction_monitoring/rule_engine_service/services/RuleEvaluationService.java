@@ -39,7 +39,7 @@ public class RuleEvaluationService {
     private final TransactionHistoryRepository transactionHistoryRepository;
     private final OutboxEventFactory outboxEventFactory;
 
-    private static final String TOPIC = KafkaTopic.TOPIC;
+    private static final String TOPIC = KafkaTopic.TRANSACTION_FLAGGED;
 
     @Value("${rules.recent-history-window-hours:24}")
     private long recentHistoryWindowHours;
