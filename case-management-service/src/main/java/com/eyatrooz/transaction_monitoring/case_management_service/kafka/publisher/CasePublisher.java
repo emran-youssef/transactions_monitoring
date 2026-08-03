@@ -10,16 +10,18 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class CasePublisher {
+
+      /**
+     * THIS CLASS IS DEAD CODE NOW, OUTBOX PATTERN HANDLE THE PUBLISHING
+     */
 
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafka;
 
     public void publish(String topic, CasePayload response){
         var event = EventMessage.of(topic, response);
-
         try {
             String json = objectMapper.writeValueAsString(event);
             kafka.send(topic, response.getAccountId(), json);
