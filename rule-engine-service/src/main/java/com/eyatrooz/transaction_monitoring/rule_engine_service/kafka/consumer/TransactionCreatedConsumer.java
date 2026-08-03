@@ -25,7 +25,7 @@ public class TransactionCreatedConsumer {
     private final TransactionHistoryRepository transactionHistoryRepository;
 
 
-    @KafkaListener(topics = "transactions.created.v1", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = KafkaTopic.TOPIC, groupId = "${spring.kafka.consumer.group-id}")
     public void onTransactionCreated(String message){
         EventMessage<TransactionCreatedPayload> event;
         try {

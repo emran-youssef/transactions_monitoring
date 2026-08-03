@@ -1,4 +1,4 @@
-package com.eyatrooz.transaction_monitoring.transaction_service.kafka;
+package com.eyatrooz.transaction_monitoring.transaction_service.kafka.helpers;
 
 import lombok.Builder;
 import lombok.Getter;

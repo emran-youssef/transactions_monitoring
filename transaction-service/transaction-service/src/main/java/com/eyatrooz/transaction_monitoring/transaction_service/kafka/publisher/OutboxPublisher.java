@@ -1,4 +1,4 @@
-package com.eyatrooz.transaction_monitoring.transaction_service.kafka;
+package com.eyatrooz.transaction_monitoring.transaction_service.kafka.publisher;
 
 import com.eyatrooz.transaction_monitoring.transaction_service.entities.OutboxEvent;
 import com.eyatrooz.transaction_monitoring.transaction_service.repositories.OutboxEventsRepository;
@@ -26,11 +26,13 @@ public class OutboxPublisher {
     @Transactional
     @Scheduled(fixedDelay = 1000)
     public void publishPendingEvent(){
+
         List<OutboxEvent> pending = outboxEventsRepository
                 .findByPublishedFalseOrderByCreatedAtAsc(PageRequest.of(0, BATCH_SIZE));
 
         for(OutboxEvent event : pending){
             try {
+
                 kafka.send(event.getEventType(), event.getAggregateId(), event.getPayload())
                         .get(); // Wait for Kafka acknowledgment before marking the event as published.
 

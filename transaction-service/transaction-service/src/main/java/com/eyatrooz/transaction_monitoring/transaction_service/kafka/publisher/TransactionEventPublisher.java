@@ -1,15 +1,15 @@
-package com.eyatrooz.transaction_monitoring.transaction_service.kafka;
+package com.eyatrooz.transaction_monitoring.transaction_service.kafka.publisher;
 
 import com.eyatrooz.transaction_monitoring.transaction_service.dtos.TransactionResponse;
+import com.eyatrooz.transaction_monitoring.transaction_service.kafka.helpers.EventMessage;
+import com.eyatrooz.transaction_monitoring.transaction_service.kafka.helpers.KafkaTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class TransactionEventPublisher {
 
