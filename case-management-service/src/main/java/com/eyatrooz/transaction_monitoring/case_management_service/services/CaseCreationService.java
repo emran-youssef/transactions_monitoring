@@ -10,7 +10,7 @@ import com.eyatrooz.transaction_monitoring.case_management_service.mappers.CaseM
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.CaseRepository;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.FlaggedTransactionEventRepository;
 import com.eyatrooz.transaction_monitoring.case_management_service.repositories.OutboxEventsRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,21 +32,19 @@ public class CaseCreationService {
     public void processFlaggedTransaction(TransactionFlaggedPayload transactionFlagged){
         log.info("=== Processing flagged transaction {} ===", transactionFlagged.getTransactionId());
 
-        Long transactionId = transactionFlagged.getTransactionId();
+        var transactionId = transactionFlagged.getTransactionId();
+        var flaggedTransaction = FlaggedTransactionEvent.from(transactionFlagged);
 
-        // Idempotency check #1: event-level
-        if(transactionExists(transactionId)) {
+        if(!flaggedTransactionEventRepository.existsByTransactionId(transactionId)) {
+            flaggedTransactionEventRepository.save(flaggedTransaction);
+            log.warn("Flagged transaction event persisted for transactionId={}", transactionFlagged.getTransactionId());
+        } else {
             log.warn("Flagged Event already recorded for transactionId={}", transactionFlagged.getTransactionId());
-            return ;
         }
 
-        var flaggedTransaction = FlaggedTransactionEvent.from(transactionFlagged);
-        flaggedTransactionEventRepository.save(flaggedTransaction);
-
-        // Idempotency check #2: case-level
-        if(caseExists(transactionId)){
+        if(caseRepository.existsByTransactionId(transactionId)){
             log.warn("Case already exists for transactionId={}, skipping creation", transactionId);
-            return ;
+            return;
         }
 
         // NOTE: newCase creation opens a history as well
@@ -57,21 +55,12 @@ public class CaseCreationService {
         log.info("Case created: id={}, transactionId={}, status={}",
                 newCasePersisted.getId(), newCasePersisted.getTransactionId(), newCasePersisted.getStatus());
 
+        // outbox publisher
         var casePayload = caseMapper.toCasePayload(newCasePersisted);
         outboxEventRepository.save(outboxEventFactory.create(AggregateType.CASE_CREATION, newCasePersisted.getId().toString(), KafkaTopics.CASE_CREATED, casePayload));
         log.info("Outbox event recorded: type={}, accountId={}", KafkaTopics.CASE_CREATED, newCasePersisted.getAccountId());
 
     }
-
-
-    // -- helpers
-    private boolean transactionExists(Long transactionId){
-        return flaggedTransactionEventRepository.existsByTransactionId(transactionId);}
-
-    private boolean caseExists(Long transactionId){
-        return caseRepository.existsByTransactionId(transactionId);
-    }
-
 
 
 }
