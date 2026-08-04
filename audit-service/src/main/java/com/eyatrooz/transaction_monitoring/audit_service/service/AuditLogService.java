@@ -15,13 +15,12 @@ public class AuditLogService {
     private final AuditLogRepository auditLogRepository;
 
     public void record(EventMessage<?> message, String entityId, String payload) {
-        if (auditLogRepository.findByEventId(message.getEventId()).isPresent()) {
+        if (auditLogRepository.existsByEventId(message.getEventId())) {
             log.debug("eventId={} already recorded, skipping", message.getEventId());
             return;
         }
 
         var audit = AuditLogEntry.from(message, entityId, payload);
-
         auditLogRepository.save(audit);
         log.info("Recorded audit log entry eventId={} eventType={} entityId={}",
                 message.getEventId(), message.getEventType(), entityId);

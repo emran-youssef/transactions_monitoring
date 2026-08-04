@@ -10,4 +10,6 @@ public interface AuditLogRepository extends JpaRepository<AuditLogEntry, Long> {
 
     Optional<AuditLogEntry> findByEventId(String eventId);
     List<AuditLogEntry> findByEntityIdOrderByOccurredAtAsc(String entityId);
+
+    boolean existsByEventId(String eventId);
 }

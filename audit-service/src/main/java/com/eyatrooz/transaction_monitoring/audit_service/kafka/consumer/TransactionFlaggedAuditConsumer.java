@@ -23,10 +23,8 @@ public class TransactionFlaggedAuditConsumer {
     public void onTransactionFlagged(String message) {
         EventMessage<TransactionFlaggedPayload> event;
         try {
-            event = objectMapper.readValue(
-                    message,
-                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, TransactionFlaggedPayload.class)
-            );
+            event = objectMapper.readValue(message,
+                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, TransactionFlaggedPayload.class));
         } catch (JacksonException ex) {
             log.error("Failed to deserialize transactions.flagged.v1 message: {}", message, ex);
             return;

@@ -44,7 +44,7 @@ public class TransactionCreatedConsumer {
 
         var payload = event.getPayload();
 
-        log.info("============== Processing transaction {} ==============", payload.getId());
+        log.info(" === Processing transaction {} === ", payload.getId());
 
         var transaction = TransactionHistory.from(payload);
         if (!transactionHistoryRepository.existsByTransactionId(payload.getId())) {

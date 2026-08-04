@@ -23,10 +23,8 @@ public class CaseCreatedAuditConsumer {
     public void onCaseCreated(String message) {
         EventMessage<CaseCreatedPayload> event;
         try {
-            event = objectMapper.readValue(
-                    message,
-                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, CaseCreatedPayload.class)
-            );
+            event = objectMapper.readValue(message,
+                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, CaseCreatedPayload.class));
         } catch (JacksonException ex) {
             log.error("Failed to deserialize cases.created.v1 message: {}", message, ex);
             return;

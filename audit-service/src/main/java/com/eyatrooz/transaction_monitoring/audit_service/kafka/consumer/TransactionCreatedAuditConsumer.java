@@ -23,10 +23,8 @@ public class TransactionCreatedAuditConsumer {
     public void onTransactionCreated(String message) {
         EventMessage<TransactionCreatedPayload> event;
         try {
-            event = objectMapper.readValue(
-                    message,
-                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, TransactionCreatedPayload.class)
-            );
+            event = objectMapper.readValue(message,
+                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, TransactionCreatedPayload.class));
         } catch (JacksonException ex) {
             log.error("Failed to deserialize transactions.created.v1 message: {}", message, ex);
             return;
@@ -34,5 +32,8 @@ public class TransactionCreatedAuditConsumer {
 
         String entityId = event.getPayload().getId();
         auditLogService.record(event, entityId, message);
+
     }
 }
+
+
