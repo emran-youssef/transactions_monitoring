@@ -28,22 +28,13 @@ public class TransactionCreatedConsumer {
 
 
     @KafkaListener(topics = KafkaTopic.TRANSACTION_CREATED, groupId = "${spring.kafka.consumer.group-id}")
-    public void onTransactionCreated(String message) {
-        EventMessage<TransactionCreatedPayload> event;
-        try {
-            event = objectMapper.readValue(
-                    message,
-                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, TransactionCreatedPayload.class)
-            );
-            log.info("Received message from kafka for transaction_id={}", event.getPayload().getId());
+    public void onTransactionCreated(String message) throws JacksonException {
+        EventMessage<TransactionCreatedPayload> event = objectMapper.readValue(message,
+                objectMapper.getTypeFactory().constructParametricType(EventMessage.class, TransactionCreatedPayload.class));
 
-        } catch (JacksonException ex) {
-            log.error("Failed to deserialize transactions.created.v1 message: {}", message, ex);
-            return;
-        }
+        log.info("Received message from kafka for transaction_id={}", event.getPayload().getId());
 
         var payload = event.getPayload();
-
         log.info(" === Processing transaction {} === ", payload.getId());
 
         var transaction = TransactionHistory.from(payload);
@@ -61,5 +52,5 @@ public class TransactionCreatedConsumer {
         }
 
 
-        }
     }
+}
