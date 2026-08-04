@@ -5,13 +5,11 @@ import com.eyatrooz.transaction_monitoring.audit_service.kafka.KafkaTopics;
 import com.eyatrooz.transaction_monitoring.audit_service.kafka.payload.CaseUpdatedPayload;
 import com.eyatrooz.transaction_monitoring.audit_service.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CaseUpdatedAuditConsumer {
@@ -20,15 +18,9 @@ public class CaseUpdatedAuditConsumer {
     private final AuditLogService auditLogService;
 
     @KafkaListener(topics = KafkaTopics.CASE_UPDATED, groupId = "${spring.kafka.consumer.group-id}")
-    public void onCaseUpdated(String message) {
-        EventMessage<CaseUpdatedPayload> event;
-        try {
-            event = objectMapper.readValue(message,
-                    objectMapper.getTypeFactory().constructParametricType(EventMessage.class, CaseUpdatedPayload.class));
-        } catch (JacksonException ex) {
-            log.error("Failed to deserialize cases.updated.v1 message: {}", message, ex);
-            return;
-        }
+    public void onCaseUpdated(String message) throws JacksonException {
+        EventMessage<CaseUpdatedPayload> event = objectMapper.readValue(message,
+                objectMapper.getTypeFactory().constructParametricType(EventMessage.class, CaseUpdatedPayload.class));
 
         String entityId = event.getPayload().getId();
         auditLogService.record(event, entityId, message);
