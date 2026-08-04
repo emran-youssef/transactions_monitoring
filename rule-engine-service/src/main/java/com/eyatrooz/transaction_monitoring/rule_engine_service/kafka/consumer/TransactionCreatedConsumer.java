@@ -4,6 +4,7 @@ import com.eyatrooz.transaction_monitoring.rule_engine_service.dtos.TransactionC
 import com.eyatrooz.transaction_monitoring.rule_engine_service.entities.TransactionHistory;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers.EventMessage;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.kafka.helpers.KafkaTopic;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.RuleEvaluationRepository;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.TransactionHistoryRepository;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.services.RuleEvaluationService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 @RequiredArgsConstructor
 public class TransactionCreatedConsumer {
+    private final RuleEvaluationRepository ruleEvaluationRepository;
 
 
     private final ObjectMapper objectMapper;
@@ -26,7 +28,7 @@ public class TransactionCreatedConsumer {
 
 
     @KafkaListener(topics = KafkaTopic.TRANSACTION_CREATED, groupId = "${spring.kafka.consumer.group-id}")
-    public void onTransactionCreated(String message){
+    public void onTransactionCreated(String message) {
         EventMessage<TransactionCreatedPayload> event;
         try {
             event = objectMapper.readValue(
@@ -40,33 +42,24 @@ public class TransactionCreatedConsumer {
             return;
         }
 
-        TransactionCreatedPayload payload = event.getPayload();
+        var payload = event.getPayload();
 
-        log.info("==================================================");
-        log.info("Processing transaction {}", payload.getId());
-        log.info("==================================================");
+        log.info("============== Processing transaction {} ==============", payload.getId());
 
-        if(transactionHistoryRepository.existsByTransactionId(payload.getId())){
-            log.info("transactionId={} already in transaction_history, skipping", payload.getId());
-            return;
+        var transaction = TransactionHistory.from(payload);
+        if (!transactionHistoryRepository.existsByTransactionId(payload.getId())) {
+            transactionHistoryRepository.save(transaction);
+            log.info("Persisted transaction_history for transactionId={}", payload.getId());
+        } else {
+            log.info("transactionId={} already in transaction_history, skipping insert", payload.getId());
         }
 
-        var transaction = TransactionHistory.builder()
-                .transactionId(payload.getId())
-                .accountId(payload.getAccountId())
-                .amount(payload.getAmount())
-                .transactionType(payload.getTransactionType())
-                .createdAt(payload.getCreatedAt())
-                .receivedAt(payload.getReceivedAt())
-                .build();
-
-        transactionHistoryRepository.save(transaction);
-        log.info("Persisted transaction_history for transactionId={}", payload.getId());
-
-        ruleEvaluationService.evaluate(transaction);
+        if (!ruleEvaluationRepository.existsByTransactionId(payload.getId())){
+            ruleEvaluationService.evaluate(transaction);
+        } else {
+            log.info("transactionId={} already evaluated, skipping", payload.getId());
+        }
 
 
-
-
+        }
     }
-}

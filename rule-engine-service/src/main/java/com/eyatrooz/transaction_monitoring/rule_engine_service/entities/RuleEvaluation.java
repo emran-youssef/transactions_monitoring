@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.rule_engine_service.entities;
 
+import com.eyatrooz.transaction_monitoring.rule_engine_service.rules.RuleExecutorResult;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Table(name = "rule_evaluations")
 @Entity
@@ -47,4 +49,20 @@ public class RuleEvaluation {
             this.evaluatedAt = Instant.now();
     }
 
+    public static RuleEvaluation from(RuleExecutorResult result, TransactionHistory transactionHistory) {
+        var evaluation =  RuleEvaluation.builder()
+                .transactionId(transactionHistory.getTransactionId())
+                .accountId(transactionHistory.getAccountId())
+                .riskScore(result.totalScore())
+                .flagged(result.flagged())
+                .build();
+
+        evaluation.setResults(
+                result.ruleResults().stream()
+                        .map(rule -> RuleEvaluationResult.toResultsRow(rule, evaluation))
+                        .collect(Collectors.toCollection(ArrayList::new))
+        );
+
+        return evaluation;
+    }
 }

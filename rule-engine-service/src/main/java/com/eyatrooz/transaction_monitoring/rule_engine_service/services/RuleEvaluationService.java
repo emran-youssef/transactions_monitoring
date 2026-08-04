@@ -56,8 +56,7 @@ public class RuleEvaluationService {
         RuleContext context = new RuleContext(transaction, recentHistory);
         RuleExecutorResult result = ruleExecutor.execute(context);
 
-        // persist the result to ruleEvaluation.
-        var ruleEvaluation = toEvaluation(result, transaction);
+        var ruleEvaluation = RuleEvaluation.from(result, transaction);
 
         // it also cascades to rule_evaluation_results
         ruleEvaluationRepository.save(ruleEvaluation);
@@ -71,32 +70,5 @@ public class RuleEvaluationService {
         }
     }
 
-    // Helpers
-    private RuleEvaluation toEvaluation(RuleExecutorResult result, TransactionHistory transactionHistory) {
-        RuleEvaluation evaluation = RuleEvaluation.builder()
-                .transactionId(transactionHistory.getTransactionId())
-                .accountId(transactionHistory.getAccountId())
-                .riskScore(result.totalScore())
-                .flagged(result.flagged())
-                .build();
-
-        evaluation.setResults(
-                result.ruleResults().stream()
-                        .map(rule -> toResultsRow(rule, evaluation))
-                        .collect(Collectors.toCollection(ArrayList::new))
-                );
-
-        return evaluation;
-}
-
-private RuleEvaluationResult toResultsRow(RuleResult result, RuleEvaluation parent){
-        return RuleEvaluationResult.builder()
-                .ruleEvaluation(parent)
-                .ruleName(RuleName.valueOf(result.ruleName()))
-                .triggered(result.triggered())
-                .score(result.riskScore())
-                .details(result.details())
-                .build();
-}
 
 }

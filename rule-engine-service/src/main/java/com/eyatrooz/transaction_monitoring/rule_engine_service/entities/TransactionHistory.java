@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.rule_engine_service.entities;
 
+import com.eyatrooz.transaction_monitoring.rule_engine_service.dtos.TransactionCreatedPayload;
 import com.eyatrooz.transaction_monitoring.rule_engine_service.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -46,4 +47,16 @@ public class TransactionHistory {
         if(this.receivedAt == null)
             this.receivedAt = Instant.now();
     }
+
+    public static TransactionHistory from(TransactionCreatedPayload payload){
+        return TransactionHistory.builder()
+                .transactionId(payload.getId())
+                .accountId(payload.getAccountId())
+                .amount(payload.getAmount())
+                .transactionType(payload.getTransactionType())
+                .createdAt(payload.getCreatedAt())
+                .receivedAt(payload.getReceivedAt())
+                .build();
+    }
+
 }

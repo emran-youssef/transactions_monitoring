@@ -6,11 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, Long> {
 
-    List<TransactionHistory> findByAccountIdAndCreatedAtAfter(String accountId, Instant since);
-
     boolean existsByTransactionId(Long transactionId);
+    List<TransactionHistory> findByAccountIdAndCreatedAtAfter(String accountId, Instant since);
+    Optional<TransactionHistory>findByTransactionId(Long id);
 }

@@ -1,6 +1,7 @@
 package com.eyatrooz.transaction_monitoring.rule_engine_service.entities;
 
 import com.eyatrooz.transaction_monitoring.rule_engine_service.enums.RuleName;
+import com.eyatrooz.transaction_monitoring.rule_engine_service.rules.RuleResult;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -37,6 +38,14 @@ public class RuleEvaluationResult {
     private String details;
 
 
-
+    public static RuleEvaluationResult toResultsRow(RuleResult result, RuleEvaluation parent){
+        return RuleEvaluationResult.builder()
+                .ruleEvaluation(parent)
+                .ruleName(RuleName.valueOf(result.ruleName()))
+                .triggered(result.triggered())
+                .score(result.riskScore())
+                .details(result.details())
+                .build();
+    }
 
 }
