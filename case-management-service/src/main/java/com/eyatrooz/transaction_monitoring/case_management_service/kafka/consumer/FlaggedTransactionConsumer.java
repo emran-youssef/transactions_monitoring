@@ -21,21 +21,12 @@ public class FlaggedTransactionConsumer {
     private final CaseCreationService  caseCreationService;
 
     @KafkaListener(topics = KafkaTopics.FLAGGED_TRANSACTION, groupId = "case-management-service")
-    public void consumeFlaggedTransaction(String message){
-        EventMessage<TransactionFlaggedPayload> event;
-        try {
-            event = objectMapper.readValue(message,
-                    objectMapper.getTypeFactory()
-                                .constructParametricType(EventMessage.class, TransactionFlaggedPayload.class)
-            );
-            log.info("Received message form kafka for transactionId={}, eventId={}", event.getPayload().getTransactionId(), event.getEventId());
+    public void consumeFlaggedTransaction(String message) throws JacksonException {
+        EventMessage<TransactionFlaggedPayload> event = objectMapper.readValue(message,
+                objectMapper.getTypeFactory().constructParametricType(EventMessage.class, TransactionFlaggedPayload.class));
 
-        } catch (JacksonException ex) {
-            log.error("Failed to deserialize transactions.flagged.v1 message: {}", message, ex);
-            return;
-        }
+        log.info("Received message form kafka for transactionId={}, eventId={}", event.getPayload().getTransactionId(), event.getEventId());
 
-        // proceeds the flaggedTransaction process: open case & history
         caseCreationService.processFlaggedTransaction(event.getPayload());
     }
 }
