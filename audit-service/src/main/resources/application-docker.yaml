@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://mysql-audit:3306/audit_db
+    username: "eyatrooz"
+    password: "0000"
+
+  kafka:
+    bootstrap-servers: kafka:9092
