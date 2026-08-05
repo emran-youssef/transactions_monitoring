@@ -6,8 +6,13 @@ spring:
     url: jdbc:mysql://mysql-audit:3306/audit_db
     username: "eyatrooz"
     password: "0000"
+    hikari:
+      initialization-fail-timeout: -1
 
   jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
     show-sql: false

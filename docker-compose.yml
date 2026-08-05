@@ -4,7 +4,6 @@ services:
 
   mysql-transactions:
     image: mysql:8.0
-    restart: unless-stopped
     environment:
         MYSQL_ROOT_PASSWORD: "0000"
         MYSQL_DATABASE: transaction_db
@@ -15,9 +14,14 @@ services:
     volumes:
       - mysql_transactions-data:/var/lib/mysql
 
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-ueyatrooz", "-p0000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   mysql-rule-engine:
     image: mysql:8.0
-    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: "0000"
       MYSQL_DATABASE: rule_engine_db
@@ -29,9 +33,14 @@ services:
     volumes:
       - mysql_rule_engine_data:/var/lib/mysql
 
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-ueyatrooz", "-p0000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   mysql-case-management:
     image: mysql:8.0
-    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: "0000"
       MYSQL_DATABASE: case_management_db
@@ -44,9 +53,14 @@ services:
     volumes:
       - mysql_case_management_data:/var/lib/mysql
 
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-ueyatrooz", "-p0000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   mysql-audit:
     image: mysql:8.0
-    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: "0000"
       MYSQL_DATABASE: audit_db
@@ -57,6 +71,12 @@ services:
     volumes:
       - mysql_audit_data:/var/lib/mysql
 
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-ueyatrooz", "-p0000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
 
 
 
@@ -64,7 +84,6 @@ services:
 
   kafka:
     image: apache/kafka:3.8.0
-    restart: unless-stopped
     ports:
       - "9092:9092"
       - "9094:9094"
@@ -96,11 +115,13 @@ services:
       ports:
         - "8080:8080"
       depends_on:
-        - mysql-transactions
-        - kafka
+        mysql-transactions:
+          condition: service_healthy
+        kafka:
+          condition: service_started
       environment:
         SPRING_PROFILES_ACTIVE: docker
-      restart: unless-stopped
+
 
 
   rule-engine-service:
@@ -110,11 +131,12 @@ services:
       ports:
         - "8082:8082"
       depends_on:
-        - mysql-rule-engine
-        - kafka
+        mysql-rule-engine:
+          condition: service_healthy
+        kafka:
+          condition: service_started
       environment:
         SPRING_PROFILES_ACTIVE: docker
-      restart: unless-stopped
 
   case-management-service:
       build:
@@ -123,11 +145,12 @@ services:
       ports:
         - "8083:8083"
       depends_on:
-        - mysql-case-management
-        - kafka
+          mysql-case-management:
+            condition: service_healthy
+          kafka:
+            condition: service_started
       environment:
         SPRING_PROFILES_ACTIVE: docker
-      restart: unless-stopped
 
   audit-service:
       build:
@@ -136,12 +159,12 @@ services:
       ports:
         - "8085:8085"
       depends_on:
-        - mysql-audit
-        - kafka
+        mysql-audit:
+          condition: service_healthy
+        kafka:
+          condition: service_started
       environment:
         SPRING_PROFILES_ACTIVE: docker
-      restart: unless-stopped
-
 
 # ==================== Volumes ====================
 

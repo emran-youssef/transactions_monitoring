@@ -6,8 +6,13 @@ spring:
     url: jdbc:mysql://mysql-rule-engine:3306/rule_engine_db
     username: "eyatrooz"
     password: "0000"
+    hikari:
+      initialization-fail-timeout: -1
 
   jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
     show-sql: false

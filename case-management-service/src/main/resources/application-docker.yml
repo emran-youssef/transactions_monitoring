@@ -6,8 +6,13 @@ spring:
     url: jdbc:mysql://mysql-case-management:3306/case_management_db
     username: "eyatrooz"
     password: "0000"
+    hikari:
+      initialization-fail-timeout: -1
 
   jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
     show-sql: false
@@ -18,7 +23,7 @@ spring:
     consumer:
       group-id: case-management-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.StringDeserializer
       auto-offset-reset: earliest
 
     producer:
