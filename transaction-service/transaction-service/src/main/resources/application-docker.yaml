@@ -1,8 +1,32 @@
 spring:
+  application:
+    name: transaction-service
+
   datasource:
     url: jdbc:mysql://mysql-transactions:3306/transaction_db
     username: "eyatrooz"
     password: "0000"
 
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
   kafka:
     bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+logging:
+  level:
+    root: WARN
+    com.eyatrooz.transaction_monitoring: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.apache.kafka: WARN
+    com.zaxxer.hikari: WARN
+
+jwt:
+  secret: kodDkBDlDamLV86p+r0/TH8Hli4gag7hhGrnRwksisc=
+  expiration-ms: 3600000

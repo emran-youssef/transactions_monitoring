@@ -1,8 +1,58 @@
 spring:
+  application:
+    name: rule-engine-service
+
   datasource:
     url: jdbc:mysql://mysql-rule-engine:3306/rule_engine_db
     username: "eyatrooz"
     password: "0000"
 
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
   kafka:
     bootstrap-servers: kafka:9092
+
+    consumer:
+      group-id: rule-engine-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+
+rules:
+  threshold:
+    amount: 10000
+    name: THRESHOLD
+
+  velocity:
+    window-minutes: 10
+    count: 5
+    name: VELOCITY
+
+  structuring:
+    name: STRUCTURING
+    window-minute: 60
+    min-transactions: 3
+    threshold: 1000
+
+  recent-history-window-hours: 24
+
+
+server:
+  port: 8082
+
+
+logging:
+  level:
+    root: WARN
+    com.eyatrooz.transaction_monitoring: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.apache.kafka: WARN
+    com.zaxxer.hikari: WARN

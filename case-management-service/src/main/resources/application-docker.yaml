@@ -1,8 +1,42 @@
 spring:
+  application:
+    name: case-management-service
+
   datasource:
     url: jdbc:mysql://mysql-case-management:3306/case_management_db
     username: "eyatrooz"
     password: "0000"
 
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
   kafka:
     bootstrap-servers: kafka:9092
+
+    consumer:
+      group-id: case-management-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+server:
+  port: 8083
+
+jwt:
+  secret: kodDkBDlDamLV86p+r0/TH8Hli4gag7hhGrnRwksisc=
+
+
+logging:
+  level:
+    root: WARN
+    com.eyatrooz.transaction_monitoring: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.apache.kafka: WARN
+    com.zaxxer.hikari: WARN
