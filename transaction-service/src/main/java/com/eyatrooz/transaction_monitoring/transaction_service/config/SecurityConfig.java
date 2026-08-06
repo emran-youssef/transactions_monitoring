@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.transaction_service.config;
 
+import com.eyatrooz.transaction_monitoring.transaction_service.security.GatewayHeaderAuthenticationFilter;
 import com.eyatrooz.transaction_monitoring.transaction_service.security.JwtAuthenticationEntryPoint;
 import com.eyatrooz.transaction_monitoring.transaction_service.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final GatewayHeaderAuthenticationFilter gatewayHeaderAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,7 +33,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(gatewayHeaderAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
