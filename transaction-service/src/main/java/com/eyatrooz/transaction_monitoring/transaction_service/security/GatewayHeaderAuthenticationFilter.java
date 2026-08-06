@@ -15,6 +15,7 @@ import java.util.List;
 
 @Component
 public class GatewayHeaderAuthenticationFilter extends OncePerRequestFilter {
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
