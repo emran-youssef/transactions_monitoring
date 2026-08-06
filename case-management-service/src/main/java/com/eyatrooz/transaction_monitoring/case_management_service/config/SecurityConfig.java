@@ -1,5 +1,6 @@
 package com.eyatrooz.transaction_monitoring.case_management_service.config;
 
+import com.eyatrooz.transaction_monitoring.case_management_service.security.GatewayHeaderAuthenticationFilter;
 import com.eyatrooz.transaction_monitoring.case_management_service.security.JwtAuthenticationEntryPoint;
 import com.eyatrooz.transaction_monitoring.case_management_service.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final GatewayHeaderAuthenticationFilter gatewayHeaderAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,7 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
 
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(gatewayHeaderAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

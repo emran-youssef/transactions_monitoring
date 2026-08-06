@@ -21,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    // this class no longer used, api-gateway implement this class
+
     private final JwtService jwtService;
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -40,7 +42,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
         try {
-
             jwtService.validateToken(token);
 
             String username = jwtService.extractUsername(token);
