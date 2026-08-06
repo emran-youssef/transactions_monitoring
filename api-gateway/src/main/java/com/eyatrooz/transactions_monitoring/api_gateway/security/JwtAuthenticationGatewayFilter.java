@@ -26,19 +26,16 @@ public class JwtAuthenticationGatewayFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-
         String path = exchange.getRequest().getPath().value();
 
         // let login requests through without a token
-        if (path.startsWith("/auth/login")) {
+        if (path.startsWith("/auth/login"))
             return chain.filter(exchange);
-        }
 
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX))
             return reject(exchange, "Missing or invalid Authorization header");
-        }
 
         String token = authHeader.substring(BEARER_PREFIX.length());
 
@@ -58,6 +55,7 @@ public class JwtAuthenticationGatewayFilter implements GlobalFilter, Ordered {
             return reject(exchange, "Invalid or expired token");
         }
     }
+
 
     private Mono<Void> reject(ServerWebExchange exchange, String message) {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
