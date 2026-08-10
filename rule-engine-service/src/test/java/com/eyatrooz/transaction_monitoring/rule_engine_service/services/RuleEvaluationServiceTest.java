@@ -23,8 +23,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RuleEvaluationServiceTest {
@@ -53,7 +53,6 @@ class RuleEvaluationServiceTest {
 
     @Test
     void evaluate_savesAndPublishesOutbox_whenFlagged(){
-
         // ARRANGE — the transaction being evaluated
         var transaction = TransactionHistory.builder()
                 .transactionId(1L)
@@ -84,6 +83,39 @@ class RuleEvaluationServiceTest {
         verify(ruleEvaluationMapper).toFlaggedPayload(any());
         verify(outboxEventFactory).create(any(), any(), any(), any());
         verify(outboxEventsRepository).save(any());
+    }
+
+
+    @Test
+    void evaluate_savesButSkipsOutbox_whenNotFlagged(){
+
+        // ARRANGE
+        var transaction = TransactionHistory.builder()
+                .transactionId(1L)
+                .accountId("ACC-1")
+                .amount(BigDecimal.valueOf(15000))
+                .transactionType(TransactionType.DEPOSIT)
+                .createdAt(Instant.now())
+                .receivedAt(Instant.now())
+                .build();
+
+        when(transactionHistoryRepository.findByAccountIdAndCreatedAtAfter(any(), any()))
+                .thenReturn(List.of());
+
+        when(ruleExecutor.execute(any()))
+                .thenReturn(new RuleExecutorResult(false, BigDecimal.ZERO, List.of()));
+
+        // ACT
+        ruleEvaluationService.evaluate(transaction);
+
+        // VERIFY
+        verify(ruleEvaluationRepository).save(any());
+
+        // VERIFY — since flagged=false, the outbox pipeline must NOT have run
+        verify(ruleEvaluationMapper, never()).toFlaggedPayload(any());
+        verify(outboxEventFactory, never()).create(any(), any(), any(), any());
+        verify(outboxEventsRepository, never()).save(any());
+
     }
 
 }
