@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    // this class no longer used, api-gateway implement this class
+    // this class no longer needed, api-gateway implement this class
 
     private final JwtService jwtService;
     private static final String BEARER_PREFIX = "Bearer ";
@@ -49,8 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     username,
                     null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
-            );
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (ExpiredJwtException ex) {
@@ -58,7 +57,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException ex) {
             SecurityContextHolder.clearContext();
         }
-
         filterChain.doFilter(request, response);
     }
 }
