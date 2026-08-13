@@ -16,7 +16,7 @@ The platform is composed of independent microservices, each owning its own datab
 All external client traffic enters through a single **API Gateway**, which centralizes JWT authentication before routing to the two REST-facing services.
 
 ```
-┌──────────┐
+                              ┌──────────┐
                               │  Client  │
                               └────┬─────┘
                                    │ REST (HTTPS + JWT)
@@ -107,6 +107,18 @@ All client traffic goes through the **API Gateway** (port `8888`), which is the 
 - **Infrastructure:** Docker Compose (local development — infrastructure only; services run locally via IDE)
 
 ---
+
+## Testing
+
+Unit test coverage currently spans two services:
+
+- **Rule Engine Service** — pure JUnit 5 tests for all three rule strategies (`ThresholdRule`, `VelocityRule`, `StructuringRule`), plus Mockito-based tests for `RuleEvaluationService`
+- **Case Management Service** — Mockito-based tests for `CaseCreationService` and `CaseWorkflowService`
+
+Tests run automatically on every push and pull request via GitHub Actions (see badge above). Coverage does not yet extend to Transaction Service, Audit Service, or API Gateway, and integration-level testing (e.g. Testcontainers against real Kafka/MySQL) is a planned next step, not yet implemented.
+
+---
+
 
 ## Repository Structure
 
