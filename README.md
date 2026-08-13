@@ -1,5 +1,8 @@
 # Transaction Monitoring Platform
 
+[![CI](https://github.com/emran-youssef/transactions_monitoring/actions/workflows/ci.yml/badge.svg)](https://github.com/emran-youssef/transactions_monitoring/actions/workflows/ci.yml)
+
+
 An event-driven, microservices-based fraud and AML (Anti-Money Laundering) monitoring platform built in Java and Spring Boot. The system ingests financial transactions, evaluates them against configurable business rules, and routes suspicious activity to compliance analysts for investigation — with a fully immutable audit trail across the pipeline.
 
 This is **not** a banking system or payment gateway. Transactions are assumed to originate externally (simulated via REST for development purposes); the platform's responsibility begins after a transaction has occurred.
