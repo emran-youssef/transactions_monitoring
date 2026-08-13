@@ -17,45 +17,45 @@ All external client traffic enters through a single **API Gateway**, which centr
 
 
 ```
-                                                              ┌──────────┐
-                                                              │  Client  │
-                                                              └────┬─────┘
-                                                                   │ REST (HTTPS + JWT)
-                                                                   ▼
-                                                         ┌───────────────────┐
-                                                         │    API Gateway      │
-                                                         │  (JWT validation)   │
-                                                         └─────────┬──┬────────┘
-                                                       REST        │  │        REST
-                                                    ┌──────────────┘  └──────────────┐
-                                                    ▼                                 ▼
-                                      ┌──────────────────────┐          ┌───────────────────────────┐
-                                      │  Transaction Service   │          │  Case Management Service   │
-                                      │  DB: transaction_db    │          │  DB: case_mgmt_db          │
-                                      └───────────┬─────────────┘          └─────────────▲───────────────┘
-                                                  │ publishes                              │ consumes
-                                                  │ transactions.created.v1                │ transactions.flagged.v1
-                                                  ▼                                         │
-                                      ╔═══════════════════════════════════════════════════════╗
-                                      ║               Apache Kafka (KRaft mode)                 ║
-                                      ╚═══════════════════════════════════════════════════════╝
-                                                  │                                         ▲
-                                                  │ consumes                                │ publishes
-                                                  │ transactions.created.v1                 │ transactions.flagged.v1
-                                                  ▼                                         │
-                                      ┌──────────────────────────┐
-                                      │    Rule Engine Service     │──────────────────────────┘
-                                      │    DB: rule_engine_db      │
-                                      └──────────────────────────┘
-                                
-                                      Audit Service consumes ALL four topics from Kafka:
-                                      transactions.created.v1 · transactions.flagged.v1
-                                      cases.created.v1 · cases.updated.v1
-                                
-                                                    ┌──────────────────────────────┐
-                                                    │         Audit Service           │
-                                                    │   DB: audit_db (append-only)    │
-                                                    └──────────────────────────────┘
+                                                      ┌──────────┐
+                                                      │  Client  │
+                                                      └────┬─────┘
+                                                           │ REST (HTTPS + JWT)
+                                                           ▼
+                                                 ┌───────────────────┐
+                                                 │    API Gateway      │
+                                                 │  (JWT validation)   │
+                                                 └─────────┬──┬────────┘
+                                               REST        │  │        REST
+                                            ┌──────────────┘  └──────────────┐
+                                            ▼                                 ▼
+                              ┌──────────────────────┐          ┌───────────────────────────┐
+                              │  Transaction Service   │          │  Case Management Service   │
+                              │  DB: transaction_db    │          │  DB: case_mgmt_db          │
+                              └───────────┬─────────────┘          └─────────────▲───────────────┘
+                                          │ publishes                              │ consumes
+                                          │ transactions.created.v1                │ transactions.flagged.v1
+                                          ▼                                         │
+                              ╔═══════════════════════════════════════════════════════╗
+                              ║               Apache Kafka (KRaft mode)                 ║
+                              ╚═══════════════════════════════════════════════════════╝
+                                          │                                         ▲
+                                          │ consumes                                │ publishes
+                                          │ transactions.created.v1                 │ transactions.flagged.v1
+                                          ▼                                         │
+                              ┌──────────────────────────┐
+                              │    Rule Engine Service     │──────────────────────────┘
+                              │    DB: rule_engine_db      │
+                              └──────────────────────────┘
+                        
+                              Audit Service consumes ALL four topics from Kafka:
+                              transactions.created.v1 · transactions.flagged.v1
+                              cases.created.v1 · cases.updated.v1
+                        
+                                            ┌──────────────────────────────┐
+                                            │         Audit Service           │
+                                            │   DB: audit_db (append-only)    │
+                                            └──────────────────────────────┘
 
 ```
 
