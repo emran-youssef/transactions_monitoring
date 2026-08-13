@@ -15,6 +15,7 @@ The platform is composed of independent microservices, each owning its own datab
 
 All external client traffic enters through a single **API Gateway**, which centralizes JWT authentication before routing to the two REST-facing services.
 
+```
 ┌──────────┐
                               │  Client  │
                               └────┬─────┘
@@ -55,7 +56,7 @@ All external client traffic enters through a single **API Gateway**, which centr
                     │   DB: audit_db (append-only)    │
                     └──────────────────────────────┘
 
-Legend:  ──▶ REST (synchronous)      Kafka bus = async event flow, no direct service-to-service calls
+```
 
 ### Services
 
