@@ -80,6 +80,7 @@ services:
 
 
   # ==================== Kafka ====================
+  # === some configuration where commented due to machine peformance issue when fully build with docker, uncomment when u want to build withdocker === #
 
   kafka:
     image: apache/kafka:3.8.0
