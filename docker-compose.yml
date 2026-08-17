@@ -101,7 +101,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
 
-  # ==================== Services (disabled — run locally in IntelliJ) ====================
+  # ==================== Services (disabled due machine peformance issues — run locally in IntelliJ) ====================
   # Uncomment when you want to build & run the full containerized stack (Milestone 8 mode).
   #
   # transaction-service:
