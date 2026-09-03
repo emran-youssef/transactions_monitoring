@@ -35,6 +35,7 @@ public class CaseCreationService {
         var transactionId = transactionFlagged.getTransactionId();
         var flaggedTransaction = FlaggedTransactionEvent.from(transactionFlagged);
 
+        // idempotency guard #1
         if(!flaggedTransactionEventRepository.existsByTransactionId(transactionId)) {
             flaggedTransactionEventRepository.save(flaggedTransaction);
             log.warn("Flagged transaction event persisted for transactionId={}", transactionFlagged.getTransactionId());
@@ -42,6 +43,7 @@ public class CaseCreationService {
             log.warn("Flagged Event already recorded for transactionId={}", transactionFlagged.getTransactionId());
         }
 
+        // idempotency guard #2
         if(caseRepository.existsByTransactionId(transactionId)){
             log.warn("Case already exists for transactionId={}, skipping creation", transactionId);
             return;
