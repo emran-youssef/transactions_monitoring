@@ -14,7 +14,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventMessage<T> {
-
     private String eventId;
     private String eventType;
     private Instant occurredAt;
