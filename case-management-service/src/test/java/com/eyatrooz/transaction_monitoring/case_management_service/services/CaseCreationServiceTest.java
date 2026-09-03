@@ -15,9 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -43,21 +46,20 @@ class CaseCreationServiceTest {
     @InjectMocks
     private CaseCreationService caseCreationService;
 
-    @Test
-    void processFlaggedTransaction_createsCaseAndOutBox_whenNew(){
-
+    private TransactionFlaggedPayload newFlaggedPayload() {
         var transaction = new TransactionFlaggedPayload();
         transaction.setTransactionId(1001L);
         transaction.setAccountId("ACC-100");
         transaction.setFlagged(true);
         transaction.setRiskScore(BigDecimal.valueOf(9150));
         transaction.setEvaluatedAt(Instant.now());
+        return transaction;
+    }
 
-        when(flaggedTransactionEventRepository.existsByTransactionId(any()))
-                .thenReturn(false);
+    @Test
+    void processFlaggedTransaction_createsCaseAndOutBox_whenNew(){
 
-        when(caseRepository.existsByTransactionId(any()))
-                .thenReturn(false);
+        var transaction = newFlaggedPayload();
 
         when(caseRepository.save(any()))
                 .thenReturn(Case.builder().id(1L).transactionId(1001L).accountId("ACC-100").status(CaseStatus.OPEN).build());
@@ -71,7 +73,7 @@ class CaseCreationServiceTest {
         // ACT
         caseCreationService.processFlaggedTransaction(transaction);
 
-        // VERIFY — flagged event was recorded (since it didn't exist yet)
+        // VERIFY — flagged event was persisted
         verify(flaggedTransactionEventRepository).save(any());
 
         // VERIFY — the new case was persisted
@@ -84,35 +86,44 @@ class CaseCreationServiceTest {
     }
 
     @Test
-    void processFlaggedTransaction_skipsCaseCreation_whenCaseAlreadyExists(){
+    void processFlaggedTransaction_throwsAndSkipsRestOfWork_whenFlaggedEventAlreadyExists(){
 
-        // ARRANGE
-        var transaction = new TransactionFlaggedPayload();
-        transaction.setTransactionId(1001L);
-        transaction.setAccountId("ACC-100");
-        transaction.setFlagged(true);
-        transaction.setRiskScore(BigDecimal.valueOf(9150));
-        transaction.setEvaluatedAt(Instant.now());
+        // ARRANGE — unique constraint on flagged_transaction_events.transaction_id rejects the duplicate insert
+        var transaction = newFlaggedPayload();
 
-        when(flaggedTransactionEventRepository.existsByTransactionId(any()))
-                .thenReturn(true);
+        when(flaggedTransactionEventRepository.save(any()))
+                .thenThrow(new DataIntegrityViolationException("duplicate transaction_id"));
 
-        when(caseRepository.existsByTransactionId(any()))
-                .thenReturn(true);
+        // ACT + VERIFY — the whole @Transactional method aborts, propagating the violation to the caller
+        assertThrows(DataIntegrityViolationException.class,
+                () -> caseCreationService.processFlaggedTransaction(transaction));
 
-        // ACT
-        caseCreationService.processFlaggedTransaction(transaction);
-
-        // VERIFY
-        verify(flaggedTransactionEventRepository, never()).save(any());
+        // VERIFY — nothing past the failed save runs
         verify(caseRepository, never()).save(any());
         verify(caseMapper, never()).toCasePayload(any());
         verify(outboxEventFactory, never()).create(any(), any(), any(), any());
         verify(outboxEventRepository, never()).save(any());
+    }
 
+    @Test
+    void processFlaggedTransaction_throwsAndSkipsOutbox_whenCaseAlreadyExists(){
 
+        // ARRANGE — flagged event save succeeds, but the case's unique constraint on transaction_id rejects the duplicate
+        var transaction = newFlaggedPayload();
+
+        when(caseRepository.save(any()))
+                .thenThrow(new DataIntegrityViolationException("duplicate transaction_id"));
+
+        // ACT + VERIFY
+        assertThrows(DataIntegrityViolationException.class,
+                () -> caseCreationService.processFlaggedTransaction(transaction));
+
+        // VERIFY — flagged event save was still attempted...
+        verify(flaggedTransactionEventRepository).save(any());
+        // ...but nothing past the failed case save runs
+        verify(caseMapper, never()).toCasePayload(any());
+        verify(outboxEventFactory, never()).create(any(), any(), any(), any());
+        verify(outboxEventRepository, never()).save(any());
     }
 
 }
-
-

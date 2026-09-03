@@ -32,26 +32,16 @@ public class CaseCreationService {
     public void processFlaggedTransaction(TransactionFlaggedPayload transactionFlagged){
         log.info("=== Processing flagged transaction {} ===", transactionFlagged.getTransactionId());
 
-        var transactionId = transactionFlagged.getTransactionId();
         var flaggedTransaction = FlaggedTransactionEvent.from(transactionFlagged);
 
-        // idempotency guard #1
-        if(!flaggedTransactionEventRepository.existsByTransactionId(transactionId)) {
-            flaggedTransactionEventRepository.save(flaggedTransaction);
-            log.warn("Flagged transaction event persisted for transactionId={}", transactionFlagged.getTransactionId());
-        } else {
-            log.warn("Flagged Event already recorded for transactionId={}", transactionFlagged.getTransactionId());
-        }
-
-        // idempotency guard #2
-        if(caseRepository.existsByTransactionId(transactionId)){
-            log.warn("Case already exists for transactionId={}, skipping creation", transactionId);
-            return;
-        }
+        // Idempotency: unique constraint idx_flagged_events_transaction_id rejects a repeat insert for a duplicate transactionId, rolling back this whole transaction.
+        flaggedTransactionEventRepository.save(flaggedTransaction);
+        log.info("Flagged transaction event persisted for transactionId={}", transactionFlagged.getTransactionId());
 
         // NOTE: newCase creation opens a history as well
         var newCase = Case.createFrom(transactionFlagged);
 
+        // Idempotency: unique constraint idx_cases_transaction_id rejects a repeat insert for a duplicate transactionId, rolling back this whole transaction.
         // persist newCase, and history persisted by Spring via cascade.All
         var newCasePersisted = caseRepository.save(newCase);
         log.info("Case created: id={}, transactionId={}, status={}",

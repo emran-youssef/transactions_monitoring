@@ -7,6 +7,7 @@ import com.eyatrooz.transaction_monitoring.case_management_service.kafka.KafkaTo
 import com.eyatrooz.transaction_monitoring.case_management_service.services.CaseCreationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
@@ -27,7 +28,12 @@ public class FlaggedTransactionConsumer {
 
         log.info("Received message form kafka for transactionId={}, eventId={}", event.getPayload().getTransactionId(), event.getEventId());
 
-        caseCreationService.processFlaggedTransaction(event.getPayload());
+        // Idempotency: processFlaggedTransaction's transaction rolls back cleanly on a duplicate, so it's safe to catch the violation here, outside any active transaction.
+        try {
+            caseCreationService.processFlaggedTransaction(event.getPayload());
+        } catch (DataIntegrityViolationException e) {
+            log.info("transactionId={} already processed, skipping", event.getPayload().getTransactionId());
+        }
     }
 }
 
