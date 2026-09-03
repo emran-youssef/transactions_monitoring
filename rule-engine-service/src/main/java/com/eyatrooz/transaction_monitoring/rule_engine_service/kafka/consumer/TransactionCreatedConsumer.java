@@ -9,6 +9,7 @@ import com.eyatrooz.transaction_monitoring.rule_engine_service.repositories.Tran
 import com.eyatrooz.transaction_monitoring.rule_engine_service.services.RuleEvaluationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
@@ -19,8 +20,6 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 @RequiredArgsConstructor
 public class TransactionCreatedConsumer {
-    private final RuleEvaluationRepository ruleEvaluationRepository;
-
 
     private final ObjectMapper objectMapper;
     private final RuleEvaluationService ruleEvaluationService;
@@ -38,16 +37,19 @@ public class TransactionCreatedConsumer {
         log.info(" === Processing transaction {} === ", payload.getId());
 
         var transaction = TransactionHistory.from(payload);
-        if (!transactionHistoryRepository.existsByTransactionId(payload.getId())) {
+
+        // Idempotency guard: unique constraint uq_txn_history_transaction_id rejects a repeat insert for a transaction_id already recorded.
+        try {
             transactionHistoryRepository.save(transaction);
             log.info("Persisted transaction_history for transactionId={}", payload.getId());
-        } else {
+        } catch (DataIntegrityViolationException e) {
             log.info("transactionId={} already in transaction_history, skipping insert", payload.getId());
         }
 
-        if (!ruleEvaluationRepository.existsByTransactionId(payload.getId())){
+        // Idempotency guard: unique constraint uq_rule_eval_transaction_id rejects a repeat evaluation for a transaction_id already evaluated.
+        try {
             ruleEvaluationService.evaluate(transaction);
-        } else {
+        } catch (DataIntegrityViolationException e) {
             log.info("transactionId={} already evaluated, skipping", payload.getId());
         }
 
